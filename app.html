@@ -1,0 +1,1279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Stepwords — Prototype</title>
+<link rel="stylesheet" href="https://use.typekit.net/cst1gej.css?v=2">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --paper: #fdfcf8;
+    --bg: #f4f2ea;
+    --ink: #171410;
+    --ink-65: rgba(23,20,16,.65);
+    --ink-45: #6c6c6c;   /* muted text — solid for AA contrast */
+    --ink-25: rgba(23,20,16,.25);
+    --ink-14: rgba(23,20,16,.14);
+    --ink-08: rgba(23,20,16,.08);
+    --accent: #1d3f6e;
+    --accent-hover: #244e87;
+    --accent-press: #16314f;
+    --accent-light: rgba(29,63,110,.12);
+    --gold: #e2c044;
+    --gold-light: rgba(197,150,10,.1);
+    --green: #6dc68f;   /* solved first try */
+    --yellow: #e3b13e;  /* solved on a later try */
+    --assist: #b7c0cb;  /* revealed by a hint */
+    --serif: "kazimirtext", serif;
+    --sans: "Libre Franklin", sans-serif;
+    --cell: 32px;
+  }
+  body {
+    background: #1c1c1e;
+    color: #e8e6e1;
+    font-family: var(--sans);
+    font-smooth: never;
+    font-smoothing: antialiased;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 28px 16px;
+  }
+  .phone-label {
+    font-size: 11px;
+    color: rgba(232,230,225,.4);
+    letter-spacing: .1em;
+    text-transform: uppercase;
+  }
+  .phone {
+    position: relative;
+    width: 420px;
+    max-width: 100%;
+    height: 780px;
+    border-radius: 24px;
+    overflow: hidden;
+    border: 2px solid rgba(255,255,255,.08);
+    box-shadow: 0 8px 40px rgba(0,0,0,.4);
+    background: var(--bg);
+  }
+
+  /* ── screen router ── */
+  .screen {
+    position: absolute;
+    inset: 0;
+    background: var(--bg);
+    color: var(--ink);
+    display: flex;
+    flex-direction: column;
+    opacity: 0;
+    transform: translateY(10px);
+    pointer-events: none;
+    transition: opacity .28s ease, transform .28s ease;
+  }
+  .screen.active { opacity: 1; transform: none; pointer-events: auto; }
+
+  /* ══════════════ HOME ══════════════ */
+  .home-top { padding: 18px 22px 0; display: flex; justify-content: space-between; align-items: center; }
+  .home-top .wordmark { font-family: var(--serif); font-size: 32px; font-weight: 600; }
+  .home-meta {
+    padding: 6px 22px 18px; display: flex; justify-content: space-between; align-items: center;
+    font-size: 13px; color: var(--ink-45);
+  }
+  .home-meta .date { letter-spacing: normal; }
+  .home-meta .streak { display: flex; align-items: center; gap: 5px; }
+  .home-meta .streak strong { color: var(--ink-65); }
+
+  /* ── home cards: horizontal rows with equal-width icons (Daily = lead) ── */
+  .home-card {
+    margin: 0 14px 10px; background: var(--paper); border-radius: 16px; padding: 16px 18px;
+    cursor: pointer; box-shadow: 0 1px 4px rgba(23,20,16,.06);
+    display: flex; align-items: center; gap: 14px; transition: box-shadow .15s, transform .1s;
+  }
+  .home-card:hover { box-shadow: 0 2px 8px rgba(23,20,16,.1); }
+  .home-card:active { transform: scale(.99); }
+  .home-card.lead { padding: 24px 18px; margin-bottom: 12px; }
+  .home-card .hc-text { flex: 1; min-width: 0; }
+  .home-card h4 { font-family: var(--serif); font-weight: 600; font-size: 16px; }
+  .home-card.lead h4 { font-size: 20px; }
+  .home-card .desc { font-size: 11.5px; color: var(--ink-45); margin-top: 1px; }
+  .home-card .arrow { color: var(--ink-25); flex-shrink: 0; display: flex; }
+  .home-card .arrow svg { width: 15px; height: 15px; }
+  .home-play {
+    background: var(--accent); color: #fff; border: none; font-family: var(--sans); font-weight: 600;
+    font-size: 13px; padding: 9px 26px; border-radius: 22px; cursor: pointer; flex-shrink: 0; letter-spacing: .02em;
+  }
+
+  /* equal-width 69px icon column keeps the text columns aligned */
+  .hc-icon { width: 69px; flex-shrink: 0; display: flex; align-items: center; }
+
+  .hstair { display: flex; flex-direction: column; gap: 2.5px; align-items: flex-start; }
+  .hstair .r { display: flex; gap: 2.5px; }
+  .hstair .b { width: 9.375px; height: 9.375px; border-radius: 1.875px; background: var(--accent); }
+  .hstair .b.g { background: rgba(29,63,110,.18); }
+  .hstair.gold .b { background: var(--gold); }
+  .hstair.gold .b.g { background: rgba(197,150,10,.24); }
+
+  .create-tile { width: 57px; height: 34px; background: rgba(23,20,16,.05); border-radius: 7px; display: flex; align-items: center; justify-content: center; }
+  .create-tile svg { width: 20px; height: 20px; color: var(--ink-45); }
+
+  /* kept — used by the info / credits modal Done button */
+  .play-btn {
+    display: inline-block; background: var(--accent); color: #fff; font-size: 14px; font-weight: 600;
+    padding: 10px 40px; border-radius: 24px; letter-spacing: .02em; border: none; cursor: pointer;
+  }
+
+  .home-footer {
+    margin-top: auto; padding: 24px 22px 32px; display: flex; justify-content: center; gap: 28px;
+    font-size: 13px; color: var(--ink-45);
+  }
+  .home-footer span { cursor: pointer; }
+  .home-footer span:hover { color: var(--ink-65); }
+
+  /* ══════════════ GAME ══════════════ */
+  .game-top { padding: 14px 18px; display: flex; justify-content: space-between; align-items: center; position: relative; }
+  .icon-square {
+    width: 32px; height: 32px; border-radius: 10px; background: var(--paper); border: none; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; box-shadow: 0 1px 3px rgba(23,20,16,.06);
+  }
+  /* absolutely centered so the title stays centered regardless of side-button widths */
+  .title-wrap {
+    position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+    display: flex; flex-direction: column; align-items: center; gap: 1px; pointer-events: none;
+  }
+  .top-actions { display: flex; align-items: center; gap: 8px; }
+  .game-top .title { font-family: var(--serif); font-size: 17px; font-weight: 600; }
+  .game-top .game-date { font-family: var(--sans); font-size: 11px; color: var(--ink-45); letter-spacing: normal; }
+  .menu-dots { font-size: 16px; color: var(--ink-45); letter-spacing: 2px; }
+
+  .menu-pop {
+    position: absolute; top: 50px; right: 18px; background: var(--paper); border-radius: 12px;
+    box-shadow: 0 6px 24px rgba(23,20,16,.16); padding: 6px; z-index: 30; min-width: 160px;
+    display: none; flex-direction: column;
+  }
+  .menu-pop.open { display: flex; }
+  .menu-pop button {
+    background: none; border: none; text-align: left; padding: 10px 12px; border-radius: 8px;
+    font-family: var(--sans); font-size: 13.5px; color: var(--ink); cursor: pointer;
+  }
+  .menu-pop button:hover { background: var(--bg); }
+
+  /* hint menu */
+  .hint-pop {
+    position: absolute; top: 42px; right: 18px; background: var(--paper); border-radius: 12px;
+    box-shadow: 0 6px 24px rgba(23,20,16,.16); padding: 6px; z-index: 30; width: 244px;
+    display: none; flex-direction: column;
+  }
+  .hint-pop.open { display: flex; }
+  .hint-pop button {
+    background: none; border: none; text-align: left; padding: 9px 12px; border-radius: 8px;
+    cursor: pointer; display: flex; flex-direction: column; gap: 2px;
+  }
+  .hint-pop button:hover { background: var(--bg); }
+  .hint-pop .ht { font-family: var(--sans); font-size: 13.5px; font-weight: 600; color: var(--ink); }
+  .hint-pop .hc { font-family: var(--sans); font-size: 11px; color: var(--ink-45); }
+
+  .game-stats { position: relative; padding: 6px 18px 10px; display: flex; align-items: center; gap: 14px; font-size: 12.5px; color: var(--ink-45); }
+  .game-stats .stars { color: var(--gold); display: inline-flex; gap: 3px; }
+  .game-stats .timer { font-variant-numeric: tabular-nums; font-weight: 500; }
+  .game-stats .spacer { flex: 1; }
+
+  .board { flex: 1; padding: 18px 16px 12px; display: flex; flex-direction: column; gap: 5px; }
+  .board.shake { animation: shake .4s; }
+  @keyframes shake { 0%,100%{transform:translateX(0)} 20%,60%{transform:translateX(-6px)} 40%,80%{transform:translateX(6px)} }
+  .row { display: flex; align-items: center; gap: 4px; }
+  .row .num { width: 18px; margin-right: 4px; font-size: 11px; color: var(--ink-25); text-align: right; font-variant-numeric: tabular-nums; }
+  .row .num.sel { background: var(--accent); color: #fff; border-radius: 5px; text-align: center; padding: 3px 0; }
+  .cell {
+    width: var(--cell); height: var(--cell); display: flex; align-items: center; justify-content: center;
+    font-family: var(--serif); font-weight: 600; font-size: 17px; border-radius: 6px; position: relative;
+  }
+  .cell.solved { border: 1px solid var(--ink-25); background: var(--bg); }
+  .cell.solved.green { background: var(--green); border-color: var(--green); color: var(--ink); }
+  .cell.solved.yellow { background: var(--yellow); border-color: var(--yellow); color: var(--ink); }
+  .cell.solved.assist { background: var(--assist); border-color: var(--assist); color: var(--ink); }
+  .cell.active { border: 1px solid var(--ink-45); background: #fff; cursor: pointer; }
+  .cell.active.pending { border-color: var(--ink-14); background: var(--paper); }
+  .cell.active.cursor { border: 1.5px solid var(--accent); background: #fff; }
+  .cell.empty { border: 1px solid var(--ink-08); background: var(--paper); }
+  .cell .stairs { position: absolute; bottom: 2px; right: 2px; width: 10px; height: 10px; color: var(--ink); opacity: .5; pointer-events: none; }
+  .cell.empty .stairs { opacity: .3; }
+  /* delightful row-solve ripple: scale up, lift (higher toward the right), then settle */
+  @keyframes solveBounce {
+    0%   { transform: translateY(0) scale(1); }
+    25%  { transform: translateY(0) scale(1.08); }
+    55%  { transform: translateY(calc((5px + var(--col, 0) * 2px) * -1)) scale(1.06); }
+    100% { transform: translateY(0) scale(1); }
+  }
+  .cell.solve-bounce {
+    animation: solveBounce .5s cubic-bezier(.34, 1.25, .5, 1) both;
+    animation-delay: calc(var(--col, 0) * 22ms);
+  }
+
+  .clue-bar { padding: 12px 18px; display: flex; align-items: center; gap: 10px; }
+  .clue-bar .arrow {
+    width: 30px; height: 30px; border-radius: 10px; background: var(--paper); border: none; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; box-shadow: 0 1px 3px rgba(23,20,16,.06); flex-shrink: 0;
+  }
+  .clue-bar .clue-text { flex: 1; text-align: center; font-family: var(--serif); font-size: 16px; font-weight: 500; }
+  .clue-bar .len { color: var(--ink-45); font-size: 14px; }
+
+  .keyboard { padding: 4px 14px 20px; }
+  .kb-row { display: flex; justify-content: center; gap: 5px; margin-top: 6px; }
+  .key {
+    flex: 1; max-width: 35px; height: 44px; border: none; border-radius: 8px; background: var(--paper);
+    box-shadow: 0 1px 2px rgba(23,20,16,.08); font-family: var(--sans); font-weight: 400; font-size: 14px;
+    color: var(--ink-25); cursor: pointer; display: flex; align-items: center; justify-content: center;
+  }
+  .key.avail { font-weight: 600; color: var(--ink); }
+  .key:active { transform: translateY(1px); }
+  .key.wide { max-width: 64px; flex: 1.8; font-size: 11px; letter-spacing: .06em; text-transform: uppercase; }
+  .key.submit { background: var(--accent); color: #fff; font-weight: 600; }
+
+  /* ══════════════ COMPLETION ══════════════ */
+  .done { align-items: center; justify-content: center; text-align: center; padding: 40px 28px; }
+  .done .seal {
+    width: 64px; height: 64px; border-radius: 50%; background: var(--accent-light); color: var(--accent);
+    display: flex; align-items: center; justify-content: center; margin-bottom: 20px;
+  }
+  .done h2 { font-family: var(--serif); font-size: 30px; font-weight: 600; margin-bottom: 6px; }
+  .done .sub { font-size: 13px; color: var(--ink-45); margin-bottom: 26px; }
+  .done .mini-stair { display: flex; flex-direction: column; gap: 3px; align-items: flex-start; margin-bottom: 28px; }
+  .done .ms-row { display: flex; gap: 3px; }
+  .done .ms-block { width: 12px; height: 12px; border-radius: 2px; background: var(--green); }
+  .done .ms-block.yellow { background: var(--yellow); }
+  .done .ms-block.assist { background: var(--assist); }
+  .done .stat-strip {
+    display: flex; gap: 0; background: var(--paper); border-radius: 14px; padding: 16px 8px;
+    box-shadow: 0 1px 4px rgba(23,20,16,.06); margin-bottom: 28px; width: 100%; max-width: 320px;
+  }
+  .done .stat { flex: 1; display: flex; flex-direction: column; gap: 4px; border-right: 1px solid var(--ink-08); }
+  .done .stat:last-child { border-right: none; }
+  .done .stat .val { font-family: var(--serif); font-size: 20px; font-weight: 600; }
+  .done .stat .val-stars { display: inline-flex; align-items: center; justify-content: center; gap: 3px; height: 29px; }
+  .done .stat .val-stars svg { width: 17px; height: 17px; }
+  .done .stat .lbl { font-size: 10.5px; color: var(--ink-45); letter-spacing: .04em; text-transform: uppercase; }
+  .done .share-btn {
+    background: var(--accent); color: #fff; border: none; cursor: pointer; font-family: var(--sans);
+    font-size: 14px; font-weight: 600; padding: 13px 0; border-radius: 26px; width: 100%; max-width: 320px;
+    display: flex; align-items: center; justify-content: center; gap: 9px;
+  }
+  .done .home-link { margin-top: 24px; font-family: var(--sans); font-weight: 500; font-size: 14px; color: var(--ink-45); cursor: pointer; background: none; border: none; }
+  .done .home-link:hover { color: var(--ink-65); }
+
+  /* ══════════════ HOW-TO MODAL ══════════════ */
+  .modal-overlay {
+    position: absolute; inset: 0; background: rgba(23,20,16,.45); backdrop-filter: blur(2px);
+    z-index: 50; display: none; align-items: center; justify-content: center; padding: 24px;
+    opacity: 0; transition: opacity .25s ease;
+  }
+  .modal-overlay.open { display: flex; opacity: 1; }
+  .modal {
+    background: var(--paper); color: var(--ink); border-radius: 20px; width: 100%; max-width: 340px; padding: 32px 28px 24px;
+    display: flex; flex-direction: column; align-items: center; text-align: center;
+    box-shadow: 0 20px 60px rgba(0,0,0,.3);
+  }
+  /* info / credits modal */
+  .info-card { padding: 34px 30px 28px; }
+  .info-card .info-wordmark { font-family: var(--serif); font-size: 28px; font-weight: 600; }
+  .info-card .info-meta { font-family: var(--sans); font-size: 13px; color: var(--ink-45); margin-top: 4px; }
+  .info-card .info-meta strong { color: var(--ink-65); font-weight: 500; }
+  .info-card .info-rule { width: 44px; height: 1px; background: var(--ink-14); margin: 20px 0; }
+  .info-card .info-credits { font-family: var(--sans); font-size: 12.5px; line-height: 1.55; color: var(--ink-45); max-width: 240px; }
+  .info-card .info-done { margin-top: 24px; }
+
+  .panel { display: none; flex-direction: column; align-items: center; min-height: 260px; }
+  .panel.active { display: flex; }
+  .panel .illo { height: 96px; display: flex; align-items: center; justify-content: center; margin-bottom: 24px; }
+  .panel h3 { font-family: var(--serif); font-size: 22px; font-weight: 600; margin-bottom: 10px; }
+  .panel p { font-size: 13.5px; line-height: 1.55; color: var(--ink-65); max-width: 260px; }
+  .demo-stair { display: flex; flex-direction: column; gap: 4px; align-items: flex-start; }
+  .demo-stair .ds-row { display: flex; gap: 4px; }
+  .demo-stair .ds-cell {
+    width: 22px; height: 22px; border-radius: 4px; border: 1px solid var(--ink-25); background: var(--bg);
+    display: flex; align-items: center; justify-content: center; font-family: var(--serif); font-size: 12px; font-weight: 600;
+  }
+  .demo-stair .ds-cell.add { color: var(--accent); border-color: var(--accent); }
+  .demo-clue { font-family: var(--serif); font-size: 16px; font-weight: 500; background: var(--bg); padding: 12px 18px; border-radius: 10px; }
+  .modal-dots { display: flex; gap: 7px; margin: 22px 0 18px; }
+  .modal-dots .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--ink-14); transition: background .2s; }
+  .modal-dots .dot.on { background: var(--accent); }
+  .modal-nav { display: flex; align-items: center; justify-content: space-between; width: 100%; }
+  .modal-nav .skip { background: none; border: none; color: var(--ink-45); font-family: var(--sans); font-size: 13px; cursor: pointer; }
+  .modal-nav .next {
+    background: var(--accent); color: #fff; border: none; cursor: pointer; font-family: var(--sans);
+    font-size: 14px; font-weight: 600; padding: 11px 30px; border-radius: 24px;
+  }
+
+  /* ══════════════ INTERACTIVE STATES (hover / pressed) ══════════════ */
+  /* accent-filled buttons: Play, Submit, Share, modal Play/Next */
+  .play-btn, .home-play, .key.submit, .done .share-btn, .modal-nav .next {
+    transition: background .15s ease, transform .07s ease, box-shadow .15s ease;
+  }
+  .play-btn:hover, .home-play:hover, .key.submit:hover, .done .share-btn:hover, .modal-nav .next:hover {
+    background: var(--accent-hover);
+  }
+  .play-btn:active, .home-play:active, .key.submit:active, .done .share-btn:active, .modal-nav .next:active {
+    background: var(--accent-press); transform: translateY(1px) scale(.985);
+  }
+
+  /* paper icon buttons: back, menu (⋯), hint, clue arrows */
+  .icon-square, .clue-bar .arrow {
+    transition: background .15s ease, box-shadow .15s ease, transform .07s ease;
+  }
+  .icon-square:hover, .clue-bar .arrow:hover {
+    box-shadow: 0 0 0 1px var(--ink-14), 0 1px 4px rgba(23,20,16,.07);
+  }
+  .icon-square:active, .clue-bar .arrow:active {
+    transform: scale(.92); box-shadow: 0 0 0 1px var(--ink-14), 0 1px 2px rgba(23,20,16,.08);
+  }
+
+  /* keyboard keys */
+  .key { transition: box-shadow .12s ease, transform .06s ease; }
+  .key:hover { box-shadow: 0 0 0 1px var(--ink-14), 0 1px 3px rgba(23,20,16,.07); }
+  .key:active { transform: translateY(1px); }
+  .key.submit:hover { background: var(--accent-hover); }
+
+  /* popover menu items (overflow + hint) */
+  .menu-pop button, .hint-pop button { transition: background .12s ease; }
+  .menu-pop button:active, .hint-pop button:active { background: var(--ink-08); }
+
+  /* text buttons / links */
+  .home-footer span, .done .home-link, .modal-nav .skip { transition: color .15s ease, opacity .12s ease; }
+  .modal-nav .skip:hover { color: var(--ink-65); }
+  .home-footer span:active, .done .home-link:active, .modal-nav .skip:active { opacity: .55; }
+
+  /* ══════════════ ARCHIVE ══════════════ */
+  .arch-top { padding: 14px 18px; display: flex; align-items: center; }
+  .arch-top .title { flex: 1; text-align: center; font-family: var(--serif); font-size: 17px; font-weight: 600; }
+  .arch-top .spacer { width: 32px; flex-shrink: 0; }
+
+  .arch-toggle { display: flex; justify-content: center; padding: 4px 18px 14px; }
+  .seg { display: inline-flex; background: rgba(23,20,16,.05); border-radius: 11px; padding: 3px; }
+  .seg-btn {
+    border: none; background: none; font-family: var(--sans); font-size: 13px; font-weight: 500; color: var(--ink-45);
+    padding: 7px 26px; border-radius: 9px; cursor: pointer; transition: background .15s, color .15s, box-shadow .15s;
+  }
+  .seg-btn.active { background: var(--paper); color: var(--ink); box-shadow: 0 1px 2px rgba(23,20,16,.08); }
+
+  .arch-nav { display: flex; align-items: center; justify-content: center; gap: 16px; padding: 2px 18px 14px; }
+  .arch-nav .arch-month { font-family: var(--sans); font-size: 15px; font-weight: 600; min-width: 130px; text-align: center; }
+  .arch-nav .icon-square svg { width: 12px; height: 12px; }
+
+  .arch-cal { padding: 0 14px; }
+  .arch-weekdays { display: grid; grid-template-columns: repeat(7, 1fr); margin-bottom: 4px; }
+  .arch-weekdays span { text-align: center; font-family: var(--sans); font-size: 10.5px; color: var(--ink-45); letter-spacing: .04em; }
+  .arch-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; }
+
+  .day {
+    height: 50px; border-radius: 9px; position: relative; cursor: pointer;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px;
+  }
+  .day .dnum { font-family: var(--sans); font-size: 13px; color: var(--ink-65); font-variant-numeric: tabular-nums; }
+  .day.completed { background: var(--paper); box-shadow: 0 1px 2px rgba(23,20,16,.05); }
+  .day.failed { background: rgba(217,64,48,.08); }
+  .day.failed .dnum { color: #b23a2e; }
+  .day.progress { background: rgba(29,63,110,.07); }
+  .day.empty .dnum { color: var(--ink-45); }
+  .day.future { cursor: default; }
+  .day.future .dnum { color: var(--ink-25); }
+  .day.blank { cursor: default; }
+  .day.today { box-shadow: inset 0 0 0 1.5px var(--accent); }
+  .day.today.completed { box-shadow: inset 0 0 0 1.5px var(--accent), 0 1px 2px rgba(23,20,16,.05); }
+  .day:not(.future):not(.blank):hover { box-shadow: inset 0 0 0 1px var(--ink-14); }
+  .day.completed:not(.future):hover { box-shadow: 0 2px 5px rgba(23,20,16,.1); }
+
+  .day .pips { display: flex; gap: 1.5px; height: 9px; align-items: center; }
+  .day .pips svg { width: 9px; height: 9px; fill: var(--gold); }
+  .day .xmark { color: #c2402f; display: flex; }
+  .day .xmark svg { width: 9px; height: 9px; }
+  .day .dot { width: 5px; height: 5px; border-radius: 50%; background: var(--accent); }
+
+  .arch-legend {
+    margin-top: auto; padding: 22px 22px 30px; display: flex; flex-wrap: wrap; justify-content: center; gap: 8px 18px;
+    font-family: var(--sans); font-size: 11.5px; color: var(--ink-45);
+  }
+  .arch-legend span { display: inline-flex; align-items: center; gap: 5px; }
+  .arch-legend .lg-star svg { width: 11px; height: 11px; fill: var(--gold); }
+  .arch-legend .istar { width: 12px; height: 12px; fill: var(--gold); vertical-align: -2px; margin: 0 -3px 0 -1px; }
+  .arch-legend .lg-x svg { width: 10px; height: 10px; }
+  .arch-legend .lg-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); display: inline-block; }
+  .arch-legend .lg-none { width: 11px; height: 11px; border-radius: 3px; border: 1px solid var(--ink-14); display: inline-block; }
+
+  /* ── toast ── */
+  .toast {
+    position: absolute; bottom: 28px; left: 50%; transform: translateX(-50%) translateY(20px);
+    background: var(--ink); color: var(--paper); font-size: 13px; padding: 11px 20px; border-radius: 22px;
+    opacity: 0; pointer-events: none; transition: opacity .25s ease, transform .25s ease; z-index: 60; white-space: nowrap;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  /* ══════════════ DESKTOP (centered column, scaled up) ══════════════ */
+  @media (min-width: 760px) {
+    body { padding: 0; gap: 0; }
+    /* full-bleed: the paper background fills the whole frame like a normal site */
+    .phone {
+      width: 100%; max-width: 100%; height: 100dvh;
+      border: none; border-radius: 0; box-shadow: none; --cell: 46px;
+    }
+    /* content sits in a centered column */
+    .home, .game, .archive { align-items: center; }
+    .home > *, .game > *, .archive > * { width: 100%; max-width: 600px; margin-left: auto; margin-right: auto; }
+
+    /* board */
+    .cell { font-size: 24px; border-radius: 8px; }
+    .row { gap: 6px; }
+    .row .num { width: 26px; margin-right: 6px; font-size: 13px; }
+    .row .num.sel { border-radius: 6px; padding: 4px 0; }
+    .board { padding: 26px 30px 14px; gap: 7px; }
+    .cell .stairs { width: 13px; height: 13px; }
+
+    /* game chrome */
+    .game-top { padding: 18px 26px; }
+    .icon-square { width: 38px; height: 38px; border-radius: 12px; }
+    .game-top .title { font-size: 20px; }
+    .game-top .game-date { font-size: 12.5px; }
+    .game-stats { padding: 8px 26px 12px; font-size: 14px; gap: 16px; }
+    /* anchor popovers under their (taller, 26px-inset) buttons, matching mobile */
+    .hint-pop { top: 50px; right: 26px; }
+    .menu-pop { top: 60px; right: 26px; }
+    .game-stats .stars svg, .hint-svg { width: 17px; height: 17px; }
+
+    /* clue + keyboard, centered and wider */
+    .clue-bar { padding: 16px 26px; max-width: 560px; margin: 0 auto; width: 100%; }
+    .clue-bar .clue-text { font-size: 20px; }
+    .clue-bar .len { font-size: 17px; }
+    .clue-bar .arrow { width: 38px; height: 38px; }
+    .keyboard { padding: 8px 26px 30px; max-width: 560px; margin: 0 auto; width: 100%; }
+    .kb-row { gap: 7px; }
+    .key { max-width: 46px; height: 54px; font-size: 16px; border-radius: 10px; }
+    .key.wide { max-width: 88px; font-size: 12px; }
+
+    /* home — inherit the mobile sizing & padding within the centered column;
+       keep the 14px card inset so the cards line up the same way they do on mobile */
+    .home > .home-card { margin-left: 14px; margin-right: 14px; max-width: 572px; }
+    .play-btn { font-size: 15px; padding: 12px 48px; }   /* info-modal Done button */
+
+    /* completion */
+    .done h2 { font-size: 36px; }
+    .done .sub { font-size: 14px; }
+    .done .ms-block { width: 14px; height: 14px; }
+    .done .stat-strip, .done .share-btn { max-width: 360px; }
+    .done .stat .val { font-size: 22px; }
+  }
+
+  /* ══════════════ SMALL SCREENS (fill the viewport like a web app) ══════════════ */
+  @media (max-width: 600px) {
+    body { padding: 0; gap: 0; min-height: 100dvh; }
+    .phone-label { display: none; }
+    .phone {
+      width: 100%; max-width: 100%; height: 100dvh;
+      border: none; border-radius: 0; box-shadow: none;
+    }
+  }
+</style>
+</head>
+<body>
+
+<div class="phone" id="phone">
+
+  <!-- ══════════════ HOME ══════════════ -->
+  <section class="screen home active" id="screen-home">
+    <div class="home-top"><span class="wordmark">Stepwords</span></div>
+    <div class="home-meta">
+      <span class="date" id="home-date">Sunday, June 22, 2026</span>
+      <span class="streak"><svg width="13" height="13" viewBox="0 0 640 640" fill="#d94030"><path d="M281.6 93.9L297.6 72.6C301.6 67.2 308 64 314.7 64C326.4 64 336 73.6 336 85.3L336 107.4C336 120.5 341.4 133.1 350.9 142.1L435.6 223C484.4 269.6 512 334.2 512 401.7C512 498 434 576 337.7 576L320 576C214 576 128 490 128 384L128 380.2C128 331.4 147.4 284.6 181.9 250.1L185.4 246.6C189.6 242.4 195.4 240 201.4 240C213.9 240 224 250.1 224 262.6L224 352C224 387.3 252.7 416 288 416C323.3 416 352 387.3 352 352L352 348.1C352 330.1 344.8 312.8 332.1 300.1L293.5 261.5C269.5 237.5 256 204.8 256 170.8C256 143.1 265 116 281.6 93.9z"/></svg> <strong id="streak-count">12</strong> day streak</span>
+    </div>
+
+    <div class="home-card lead" id="hero-card">
+      <div class="hc-icon">
+        <div class="hstair">
+          <div class="r"><div class="b"></div><div class="b"></div><div class="b"></div></div>
+          <div class="r"><div class="b"></div><div class="b"></div><div class="b"></div><div class="b"></div></div>
+          <div class="r"><div class="b g"></div><div class="b g"></div><div class="b g"></div><div class="b g"></div><div class="b g"></div></div>
+          <div class="r"><div class="b g"></div><div class="b g"></div><div class="b g"></div><div class="b g"></div><div class="b g"></div><div class="b g"></div></div>
+        </div>
+      </div>
+      <div class="hc-text"><h4>Daily Puzzle</h4><div class="desc">8 words &middot; Today&rsquo;s main</div></div>
+      <button class="home-play">Play</button>
+    </div>
+
+    <div class="home-card" id="quick-card">
+      <div class="hc-icon">
+        <div class="hstair gold">
+          <div class="r"><div class="b"></div><div class="b"></div><div class="b"></div></div>
+          <div class="r"><div class="b"></div><div class="b"></div><div class="b"></div><div class="b"></div></div>
+          <div class="r"><div class="b g"></div><div class="b g"></div><div class="b g"></div><div class="b g"></div><div class="b g"></div></div>
+        </div>
+      </div>
+      <div class="hc-text"><h4>Quick</h4><div class="desc">5 words &middot; A shorter challenge</div></div>
+      <span class="arrow"><svg viewBox="0 0 512 512" fill="currentColor"><path d="M502.6 278.6c12.5-12.5 12.5-32.8 0-45.3l-160-160c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L402.7 224 32 224c-17.7 0-32 14.3-32 32s14.3 32 32 32l370.7 0-105.4 105.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0l160-160z"/></svg></span>
+    </div>
+
+    <div class="home-card" id="create-card">
+      <div class="hc-icon">
+        <div class="create-tile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg></div>
+      </div>
+      <div class="hc-text"><h4>Create</h4><div class="desc">Submit your own puzzle</div></div>
+      <span class="arrow"><svg viewBox="0 0 512 512" fill="currentColor"><path d="M502.6 278.6c12.5-12.5 12.5-32.8 0-45.3l-160-160c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L402.7 224 32 224c-17.7 0-32 14.3-32 32s14.3 32 32 32l370.7 0-105.4 105.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0l160-160z"/></svg></span>
+    </div>
+
+    <div class="home-footer">
+      <span id="footer-stats">Stats</span>
+      <span id="footer-archives">Archives</span>
+      <span id="footer-howto">How to Play</span>
+    </div>
+  </section>
+
+  <!-- ══════════════ GAME ══════════════ -->
+  <section class="screen game" id="screen-game">
+    <div class="game-top">
+      <button class="icon-square" id="game-back" title="Back">
+        <svg width="14" height="14" viewBox="0 0 512 512" fill="rgba(23,20,16,.5)" style="transform:scaleX(-1)"><path d="M502.6 278.6c12.5-12.5 12.5-32.8 0-45.3l-160-160c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L402.7 224 32 224c-17.7 0-32 14.3-32 32s14.3 32 32 32l370.7 0-105.4 105.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0l160-160z"/></svg>
+      </button>
+      <div class="title-wrap">
+        <span class="title">Stepwords</span>
+        <span class="game-date" id="game-date">Sunday, June 22, 2026</span>
+      </div>
+      <div class="top-actions">
+        <button class="icon-square" id="info-btn" title="Info &amp; credits">
+          <svg width="6" height="16" viewBox="0 0 192 512" fill="rgba(23,20,16,.5)"><path d="M48 48a48 48 0 1 1 96 0 48 48 0 1 1 -96 0zM0 192c0-17.7 14.3-32 32-32l64 0c17.7 0 32 14.3 32 32l0 256 32 0c17.7 0 32 14.3 32 32s-14.3 32-32 32L32 512c-17.7 0-32-14.3-32-32s14.3-32 32-32l32 0 0-224-32 0c-17.7 0-32-14.3-32-32z"/></svg>
+        </button>
+        <button class="icon-square menu-dots" id="menu-toggle" title="Menu"><svg width="16" height="16" viewBox="0 0 448 512" fill="currentColor"><path d="M0 256a56 56 0 1 1 112 0 56 56 0 1 1 -112 0zm168 0a56 56 0 1 1 112 0 56 56 0 1 1 -112 0zm224-56a56 56 0 1 1 0 112 56 56 0 1 1 0-112z"/></svg></button>
+      </div>
+      <div class="menu-pop" id="menu-pop">
+        <button id="menu-howto">How to Play</button>
+        <button id="menu-quit">Quit Puzzle</button>
+      </div>
+    </div>
+
+    <div class="game-stats">
+      <span class="stars" id="stars"></span>
+      <span class="timer" id="timer">0:00</span>
+      <span class="spacer"></span>
+      <button class="icon-square" id="hint-btn" title="Hint">
+        <svg width="16" height="16" viewBox="0 0 640 640" fill="rgba(23,20,16,.5)"><path d="M420.9 448C428.2 425.7 442.8 405.5 459.3 388.1C492 353.7 512 307.2 512 256C512 150 426 64 320 64C214 64 128 150 128 256C128 307.2 148 353.7 180.7 388.1C197.2 405.5 211.9 425.7 219.1 448L420.8 448zM416 496L224 496L224 512C224 556.2 259.8 592 304 592L336 592C380.2 592 416 556.2 416 512L416 496zM312 176C272.2 176 240 208.2 240 248C240 261.3 229.3 272 216 272C202.7 272 192 261.3 192 248C192 181.7 245.7 128 312 128C325.3 128 336 138.7 336 152C336 165.3 325.3 176 312 176z"/></svg>
+      </button>
+      <div class="hint-pop" id="hint-pop">
+        <button id="hint-first"><span class="ht">First letter</span><span class="hc">Reveals the opening letter · 1 misstep</span></button>
+        <button id="hint-letter"><span class="ht">Reveal a letter</span><span class="hc">Fills the selected cell · 2 missteps</span></button>
+        <button id="hint-word"><span class="ht">Reveal the word</span><span class="hc">Completes this word · caps your stars</span></button>
+      </div>
+    </div>
+
+    <div class="board" id="board"></div>
+
+    <div class="clue-bar">
+      <button class="arrow" id="clue-prev"><svg width="14" height="14" viewBox="0 0 512 512" fill="rgba(23,20,16,.35)" style="transform:scaleX(-1)"><path d="M502.6 278.6c12.5-12.5 12.5-32.8 0-45.3l-160-160c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L402.7 224 32 224c-17.7 0-32 14.3-32 32s14.3 32 32 32l370.7 0-105.4 105.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0l160-160z"/></svg></button>
+      <span class="clue-text" id="clue-text"></span>
+      <button class="arrow" id="clue-next"><svg width="14" height="14" viewBox="0 0 512 512" fill="rgba(23,20,16,.35)"><path d="M502.6 278.6c12.5-12.5 12.5-32.8 0-45.3l-160-160c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L402.7 224 32 224c-17.7 0-32 14.3-32 32s14.3 32 32 32l370.7 0-105.4 105.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0l160-160z"/></svg></button>
+    </div>
+
+    <div class="keyboard" id="keyboard"></div>
+  </section>
+
+  <!-- ══════════════ COMPLETION ══════════════ -->
+  <section class="screen done" id="screen-done">
+    <h2>Solved!</h2>
+    <div class="sub" id="done-sub">Sunday, June 22, 2026</div>
+    <div class="mini-stair" id="done-stair"></div>
+    <div class="stat-strip">
+      <div class="stat"><span class="val" id="done-time">0:00</span><span class="lbl">Time</span></div>
+      <div class="stat"><span class="val val-stars"><svg viewBox="0 0 640 640" fill="var(--gold)"><path d="M341.5 45.1C337.4 37.1 329.1 32 320.1 32C311.1 32 302.8 37.1 298.7 45.1L225.1 189.3L65.2 214.7C56.3 216.1 48.9 222.4 46.1 231C43.3 239.6 45.6 249 51.9 255.4L166.3 369.9L141.1 529.8C139.7 538.7 143.4 547.7 150.7 553C158 558.3 167.6 559.1 175.7 555L320.1 481.6L464.4 555C472.4 559.1 482.1 558.3 489.4 553C496.7 547.7 500.4 538.8 499 529.8L473.7 369.9L588.1 255.4C594.5 249 596.7 239.6 593.9 231C591.1 222.4 583.8 216.1 574.8 214.7L415 189.3L341.5 45.1z"/></svg><svg viewBox="0 0 640 640" fill="var(--gold)"><path d="M341.5 45.1C337.4 37.1 329.1 32 320.1 32C311.1 32 302.8 37.1 298.7 45.1L225.1 189.3L65.2 214.7C56.3 216.1 48.9 222.4 46.1 231C43.3 239.6 45.6 249 51.9 255.4L166.3 369.9L141.1 529.8C139.7 538.7 143.4 547.7 150.7 553C158 558.3 167.6 559.1 175.7 555L320.1 481.6L464.4 555C472.4 559.1 482.1 558.3 489.4 553C496.7 547.7 500.4 538.8 499 529.8L473.7 369.9L588.1 255.4C594.5 249 596.7 239.6 593.9 231C591.1 222.4 583.8 216.1 574.8 214.7L415 189.3L341.5 45.1z"/></svg><svg viewBox="0 0 640 640" fill="var(--gold)"><path d="M341.5 45.1C337.4 37.1 329.1 32 320.1 32C311.1 32 302.8 37.1 298.7 45.1L225.1 189.3L65.2 214.7C56.3 216.1 48.9 222.4 46.1 231C43.3 239.6 45.6 249 51.9 255.4L166.3 369.9L141.1 529.8C139.7 538.7 143.4 547.7 150.7 553C158 558.3 167.6 559.1 175.7 555L320.1 481.6L464.4 555C472.4 559.1 482.1 558.3 489.4 553C496.7 547.7 500.4 538.8 499 529.8L473.7 369.9L588.1 255.4C594.5 249 596.7 239.6 593.9 231C591.1 222.4 583.8 216.1 574.8 214.7L415 189.3L341.5 45.1z"/></svg></span><span class="lbl">Stars</span></div>
+      <div class="stat"><span class="val" id="done-streak">13</span><span class="lbl">Day streak</span></div>
+    </div>
+    <button class="share-btn" id="share-btn">
+      <svg width="16" height="18" viewBox="0 0 448 512" fill="currentColor"><path d="M246.6 9.4c-12.5-12.5-32.8-12.5-45.3 0l-128 128c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 109.3 192 320c0 17.7 14.3 32 32 32s32-14.3 32-32l0-210.7 73.4 73.4c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3l-128-128zM64 352c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 64c0 53 43 96 96 96l256 0c53 0 96-43 96-96l0-64c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 64c0 17.7-14.3 32-32 32L96 448c-17.7 0-32-14.3-32-32l0-64z"/></svg>
+      Share
+    </button>
+    <button class="home-link" id="done-home">Back to home</button>
+  </section>
+
+  <!-- ══════════════ ARCHIVE ══════════════ -->
+  <section class="screen archive" id="screen-archive">
+    <div class="arch-top">
+      <button class="icon-square" id="arch-back" title="Back">
+        <svg width="14" height="14" viewBox="0 0 512 512" fill="rgba(23,20,16,.5)" style="transform:scaleX(-1)"><path d="M502.6 278.6c12.5-12.5 12.5-32.8 0-45.3l-160-160c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L402.7 224 32 224c-17.7 0-32 14.3-32 32s14.3 32 32 32l370.7 0-105.4 105.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0l160-160z"/></svg>
+      </button>
+      <span class="title">Archives</span>
+      <span class="spacer"></span>
+    </div>
+
+    <div class="arch-toggle">
+      <div class="seg" id="arch-seg">
+        <button class="seg-btn active" data-mode="main">Main</button>
+        <button class="seg-btn" data-mode="quick">Quick</button>
+      </div>
+    </div>
+
+    <div class="arch-nav">
+      <button class="icon-square" id="arch-prev" title="Previous month">
+        <svg viewBox="0 0 320 512" fill="rgba(23,20,16,.5)"><path d="M15.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l192 192c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L106.5 256 252.7 109.3c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-192 192z"/></svg>
+      </button>
+      <span class="arch-month" id="arch-month">June 2026</span>
+      <button class="icon-square" id="arch-next" title="Next month">
+        <svg viewBox="0 0 320 512" fill="rgba(23,20,16,.5)"><path d="M310.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-192 192c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L237.5 256 67.3 109.3c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l192 192z"/></svg>
+      </button>
+    </div>
+
+    <div class="arch-cal">
+      <div class="arch-weekdays"><span>S</span><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span></div>
+      <div class="arch-grid" id="arch-grid"></div>
+    </div>
+
+    <div class="arch-legend">
+      <span><span class="lg-star"><svg viewBox="0 0 640 640"><path d="M341.5 45.1C337.4 37.1 329.1 32 320.1 32C311.1 32 302.8 37.1 298.7 45.1L225.1 189.3L65.2 214.7C56.3 216.1 48.9 222.4 46.1 231C43.3 239.6 45.6 249 51.9 255.4L166.3 369.9L141.1 529.8C139.7 538.7 143.4 547.7 150.7 553C158 558.3 167.6 559.1 175.7 555L320.1 481.6L464.4 555C472.4 559.1 482.1 558.3 489.4 553C496.7 547.7 500.4 538.8 499 529.8L473.7 369.9L588.1 255.4C594.5 249 596.7 239.6 593.9 231C591.1 222.4 583.8 216.1 574.8 214.7L415 189.3L341.5 45.1z"/></svg></span> Completed (1–3<svg class="istar" viewBox="0 0 640 640"><path d="M341.5 45.1C337.4 37.1 329.1 32 320.1 32C311.1 32 302.8 37.1 298.7 45.1L225.1 189.3L65.2 214.7C56.3 216.1 48.9 222.4 46.1 231C43.3 239.6 45.6 249 51.9 255.4L166.3 369.9L141.1 529.8C139.7 538.7 143.4 547.7 150.7 553C158 558.3 167.6 559.1 175.7 555L320.1 481.6L464.4 555C472.4 559.1 482.1 558.3 489.4 553C496.7 547.7 500.4 538.8 499 529.8L473.7 369.9L588.1 255.4C594.5 249 596.7 239.6 593.9 231C591.1 222.4 583.8 216.1 574.8 214.7L415 189.3L341.5 45.1z"/></svg>)</span>
+      <span><span class="lg-x"><svg viewBox="0 0 384 512" fill="#c2402f"><path d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z"/></svg></span> Failed</span>
+      <span><span class="lg-dot"></span> In progress</span>
+      <span><span class="lg-none"></span> Not played</span>
+    </div>
+  </section>
+
+  <!-- ══════════════ HOW-TO MODAL ══════════════ -->
+  <div class="modal-overlay" id="howto">
+    <div class="modal">
+      <div class="panel active" data-panel="0">
+        <div class="illo">
+          <div class="demo-stair">
+            <div class="ds-row"><div class="ds-cell">E</div><div class="ds-cell">A</div><div class="ds-cell">T</div></div>
+            <div class="ds-row"><div class="ds-cell add">R</div><div class="ds-cell">A</div><div class="ds-cell">T</div><div class="ds-cell">E</div></div>
+          </div>
+        </div>
+        <h3>Climb the ladder</h3>
+        <p>Each row is one letter longer. Rearrange the letters above and add one new letter to make the next word.</p>
+      </div>
+      <div class="panel" data-panel="1">
+        <div class="illo"><div class="demo-clue">Speed or charge <span style="color:var(--ink-45)">(4)</span></div></div>
+        <h3>Clues guide you</h3>
+        <p>Every row has a clue and a length. Use them to figure out which word comes next.</p>
+      </div>
+      <div class="panel" data-panel="2">
+        <div class="illo" style="gap:12px">
+          <svg width="26" height="26" viewBox="0 0 640 640" fill="var(--gold)"><path d="M341.5 45.1C337.4 37.1 329.1 32 320.1 32C311.1 32 302.8 37.1 298.7 45.1L225.1 189.3L65.2 214.7C56.3 216.1 48.9 222.4 46.1 231C43.3 239.6 45.6 249 51.9 255.4L166.3 369.9L141.1 529.8C139.7 538.7 143.4 547.7 150.7 553C158 558.3 167.6 559.1 175.7 555L320.1 481.6L464.4 555C472.4 559.1 482.1 558.3 489.4 553C496.7 547.7 500.4 538.8 499 529.8L473.7 369.9L588.1 255.4C594.5 249 596.7 239.6 593.9 231C591.1 222.4 583.8 216.1 574.8 214.7L415 189.3L341.5 45.1z"/></svg>
+          <svg width="26" height="26" viewBox="0 0 640 640" fill="var(--gold)"><path d="M341.5 45.1C337.4 37.1 329.1 32 320.1 32C311.1 32 302.8 37.1 298.7 45.1L225.1 189.3L65.2 214.7C56.3 216.1 48.9 222.4 46.1 231C43.3 239.6 45.6 249 51.9 255.4L166.3 369.9L141.1 529.8C139.7 538.7 143.4 547.7 150.7 553C158 558.3 167.6 559.1 175.7 555L320.1 481.6L464.4 555C472.4 559.1 482.1 558.3 489.4 553C496.7 547.7 500.4 538.8 499 529.8L473.7 369.9L588.1 255.4C594.5 249 596.7 239.6 593.9 231C591.1 222.4 583.8 216.1 574.8 214.7L415 189.3L341.5 45.1z"/></svg>
+          <svg width="26" height="26" viewBox="0 0 640 640" fill="var(--gold)"><path d="M341.5 45.1C337.4 37.1 329.1 32 320.1 32C311.1 32 302.8 37.1 298.7 45.1L225.1 189.3L65.2 214.7C56.3 216.1 48.9 222.4 46.1 231C43.3 239.6 45.6 249 51.9 255.4L166.3 369.9L141.1 529.8C139.7 538.7 143.4 547.7 150.7 553C158 558.3 167.6 559.1 175.7 555L320.1 481.6L464.4 555C472.4 559.1 482.1 558.3 489.4 553C496.7 547.7 500.4 538.8 499 529.8L473.7 369.9L588.1 255.4C594.5 249 596.7 239.6 593.9 231C591.1 222.4 583.8 216.1 574.8 214.7L415 189.3L341.5 45.1z"/></svg>
+          <svg width="26" height="26" viewBox="0 0 640 640" fill="rgba(23,20,16,.4)"><path d="M420.9 448C428.2 425.7 442.8 405.5 459.3 388.1C492 353.7 512 307.2 512 256C512 150 426 64 320 64C214 64 128 150 128 256C128 307.2 148 353.7 180.7 388.1C197.2 405.5 211.9 425.7 219.1 448L420.8 448zM416 496L224 496L224 512C224 556.2 259.8 592 304 592L336 592C380.2 592 416 556.2 416 512L416 496zM312 176C272.2 176 240 208.2 240 248C240 261.3 229.3 272 216 272C202.7 272 192 261.3 192 248C192 181.7 245.7 128 312 128C325.3 128 336 138.7 336 152C336 165.3 325.3 176 312 176z"/></svg>
+        </div>
+        <h3>Stars &amp; hints</h3>
+        <p>You have three stars. Lose one for every four wrong guesses. Stuck? Tap the lightbulb for a hint.</p>
+      </div>
+
+      <div class="modal-dots" id="modal-dots">
+        <div class="dot on"></div><div class="dot"></div><div class="dot"></div>
+      </div>
+      <div class="modal-nav">
+        <button class="skip" id="modal-skip">Skip</button>
+        <button class="next" id="modal-next">Next</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════ INFO / CREDITS MODAL ══════════════ -->
+  <div class="modal-overlay" id="info-modal">
+    <div class="modal info-card">
+      <span class="info-wordmark">Stepwords</span>
+      <span class="info-meta" id="info-date">Sunday, June 22, 2026</span>
+      <span class="info-meta">By <strong>Ben Reich</strong></span>
+      <div class="info-rule"></div>
+      <p class="info-credits">Today's puzzle was created and submitted by Ben Reich. Anyone can submit a Stepwords puzzle at stepwords.xyz.</p>
+      <button class="play-btn info-done" id="info-done">Done</button>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  // ── dummy puzzle: each row = previous letters + one new letter ──
+  var PUZZLE = {
+    title: "Daily Puzzle",
+    dateShort: "Sunday, June 22",
+    dateFull: "Sunday, June 22, 2026",
+    rows: [
+      { word: "EAT",     clue: "Have a meal",          start: true },
+      { word: "RATE",    clue: "Speed or charge",      newLetter: "R" },
+      { word: "TEARS",   clue: "Drops from crying",    newLetter: "S" },
+      { word: "STARED",  clue: "Looked fixedly",       newLetter: "D" },
+      { word: "ASTRIDE", clue: "Legs on either side",  newLetter: "I" }
+    ]
+  };
+
+  var $ = function (id) { return document.getElementById(id); };
+
+  // ── use today's real date (prototype) ──
+  (function () {
+    var today = new Date();
+    PUZZLE.dateFull = today.toLocaleDateString("en-US", { weekday: "long", year: "numeric", month: "long", day: "numeric" });
+    PUZZLE.dateShort = today.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" });
+    ["home-date", "game-date", "info-date"].forEach(function (id) {
+      if ($(id)) $(id).textContent = PUZZLE.dateFull;
+    });
+  })();
+
+  // ── state ──
+  // solved[i]  : bool, row fully complete
+  // colors[i]  : per-cell "green"/"yellow", set when solved
+  // work[i]    : { slots:[{ch,locked,color}], attempts } per UNSOLVED row — partial progress
+  //              persists, so rows can be worked in any order (null once solved)
+  // active     : currently selected row; cursor: focused col within it
+  var active, cursor, work, solved, colors, elapsed, timerInt, justSolvedRow;
+  var N = PUZZLE.rows.length;
+
+  // ── routing ──
+  function show(name) {
+    var screens = document.querySelectorAll(".screen");
+    for (var i = 0; i < screens.length; i++) screens[i].classList.remove("active");
+    $("screen-" + name).classList.add("active");
+  }
+
+  // ── added-letter position within a word (fixed per puzzle) ──
+  function addedIndex(row) {
+    if (!row.newLetter) return -1;
+    return row.word.indexOf(row.newLetter);
+  }
+
+  var STAIRS_SVG = '<svg class="stairs" viewBox="0 0 576 512" fill="currentColor"><path d="M326.8 101.6C326.8 80.2494 344.049 63 365.4 63H519.8C541.151 63 558.4 80.2494 558.4 101.6C558.4 122.951 541.151 140.2 519.8 140.2H404V256C404 277.351 386.751 294.6 365.4 294.6H249.6V410.4C249.6 431.751 232.351 449 211 449H56.6C31.8719 449 18 434.5 18 410.4C18 389.049 35.2494 371.8 56.6 371.8H172.4V256C172.4 234.649 189.649 217.4 211 217.4H326.8V101.6Z"/></svg>';
+
+  function makeWork(i) {
+    var len = PUZZLE.rows[i].word.length, s = [];
+    for (var c = 0; c < len; c++) s.push({ ch: "", locked: false, color: null });
+    return { slots: s, attempts: 0 };
+  }
+  function curSlots() { return work[active] ? work[active].slots : []; }
+
+  // ── render board ──
+  function renderBoard() {
+    var board = $("board");
+    board.innerHTML = "";
+    PUZZLE.rows.forEach(function (row, i) {
+      var rowEl = document.createElement("div");
+      rowEl.className = "row";
+      var num = document.createElement("span");
+      num.className = "num";
+      if (i === active) num.classList.add("sel");          // highlight the selected row
+      num.textContent = (i + 1);
+      rowEl.appendChild(num);
+
+      var len = row.word.length;
+      var addIdx = addedIndex(row);
+
+      for (var c = 0; c < len; c++) {
+        var cell = document.createElement("div");
+        cell.className = "cell";
+        var letter = "";
+
+        if (solved[i]) {
+          cell.classList.add("solved", colors[i][c]);
+          letter = row.word[c];
+          if (i === justSolvedRow) { cell.classList.add("solve-bounce"); cell.style.setProperty("--col", c); }
+        } else {
+          var slot = work[i].slots[c];
+          cell.dataset.row = i;                            // any unsolved cell is selectable
+          cell.dataset.col = c;
+          if (slot.locked) {
+            cell.classList.add("solved", slot.color);      // letters locked mid-row keep their color
+            letter = slot.ch;
+          } else if (slot.ch) {
+            cell.classList.add("active");
+            letter = slot.ch;
+            if (i === active && c === cursor) cell.classList.add("cursor", "typed");
+          } else if (i === active && c === cursor) {
+            cell.classList.add("active", "cursor");
+          } else if (i === active) {
+            cell.classList.add("active", "pending");
+          } else {
+            cell.classList.add("empty");
+          }
+        }
+
+        cell.textContent = letter;
+        // ladder marker is fixed per puzzle and ALWAYS visible (even on empty rows)
+        if (c === addIdx && row.newLetter) cell.insertAdjacentHTML("beforeend", STAIRS_SVG);
+        rowEl.appendChild(cell);
+      }
+      board.appendChild(rowEl);
+    });
+    justSolvedRow = -1;
+  }
+
+  // ── active-row helpers ──
+  function firstUnlocked(from) {
+    var s = curSlots();
+    for (var c = from; c < s.length; c++) if (!s[c].locked) return c;
+    return -1;
+  }
+  function advanceCursor() {
+    var s = curSlots();
+    for (var c = cursor + 1; c < s.length; c++) { if (!s[c].locked) { cursor = c; return; } }
+  }
+
+  // ── render keyboard ──
+  var KB = ["QWERTYUIOP", "ASDFGHJKL", "ZXCVBNM"];
+  function renderKeyboard() {
+    var kb = $("keyboard");
+    kb.innerHTML = "";
+    var avail = {};
+    PUZZLE.rows[active].word.split("").forEach(function (ch) { avail[ch] = true; });
+
+    KB.forEach(function (line, ri) {
+      var rowEl = document.createElement("div");
+      rowEl.className = "kb-row";
+      if (ri === 2) rowEl.appendChild(makeKey("Submit", "submit"));
+      line.split("").forEach(function (ch) {
+        var k = makeKey(ch, avail[ch] ? "avail" : "");
+        k.dataset.letter = ch;
+        rowEl.appendChild(k);
+      });
+      if (ri === 2) rowEl.appendChild(makeKey("⌫", "back"));
+      kb.appendChild(rowEl);
+    });
+  }
+  function makeKey(label, mod) {
+    var b = document.createElement("button");
+    b.className = "key" + (mod === "avail" ? " avail" : mod === "submit" ? " wide submit" : mod === "back" ? " wide" : "");
+    b.textContent = label;
+    if (mod === "submit") b.dataset.action = "submit";
+    else if (mod === "back") b.dataset.action = "back";
+    return b;
+  }
+
+  // ── render clue (follows the selected row) ──
+  function renderClue() {
+    var row = PUZZLE.rows[active];
+    $("clue-text").innerHTML = row.clue + ' <span class="len">(' + row.word.length + ')</span>';
+  }
+
+  // ── stars ──
+  function renderStars() {
+    var s = "";
+    for (var i = 0; i < 3; i++) {
+      s += '<svg width="14" height="14" viewBox="0 0 640 640" fill="var(--gold)"><path d="M341.5 45.1C337.4 37.1 329.1 32 320.1 32C311.1 32 302.8 37.1 298.7 45.1L225.1 189.3L65.2 214.7C56.3 216.1 48.9 222.4 46.1 231C43.3 239.6 45.6 249 51.9 255.4L166.3 369.9L141.1 529.8C139.7 538.7 143.4 547.7 150.7 553C158 558.3 167.6 559.1 175.7 555L320.1 481.6L464.4 555C472.4 559.1 482.1 558.3 489.4 553C496.7 547.7 500.4 538.8 499 529.8L473.7 369.9L588.1 255.4C594.5 249 596.7 239.6 593.9 231C591.1 222.4 583.8 216.1 574.8 214.7L415 189.3L341.5 45.1z"/></svg>';
+    }
+    $("stars").innerHTML = s;
+  }
+
+  // ── timer ──
+  function fmt(sec) { return Math.floor(sec / 60) + ":" + ("0" + (sec % 60)).slice(-2); }
+  function startTimer() {
+    stopTimer();
+    timerInt = setInterval(function () { elapsed++; $("timer").textContent = fmt(elapsed); }, 1000);
+  }
+  function stopTimer() { if (timerInt) { clearInterval(timerInt); timerInt = null; } }
+
+  // ── game lifecycle ──
+  function startGame() {
+    solved = []; colors = []; work = [];
+    for (var i = 0; i < N; i++) { solved.push(false); colors.push(null); work.push(makeWork(i)); }
+    // row 0 is the given starting word — shown complete (first-try green)
+    solved[0] = true;
+    colors[0] = PUZZLE.rows[0].word.split("").map(function () { return "green"; });
+    work[0] = null;
+    active = 1; cursor = 0;
+    elapsed = 0; justSolvedRow = -1;
+    $("timer").textContent = "0:00";
+    renderStars();
+    renderBoard();
+    renderKeyboard();
+    renderClue();
+    startTimer();
+    show("game");
+  }
+
+  // select a row (and optionally a column) to work on — rows can be done in any order
+  function selectRow(i, col) {
+    active = i;
+    if (!solved[i]) {
+      var s = work[i].slots;
+      if (typeof col === "number" && !s[col].locked) cursor = col;
+      else { var f = firstUnlocked(0); cursor = f < 0 ? 0 : f; }
+    }
+    renderClue(); renderKeyboard(); renderBoard();
+  }
+
+  function type(ch) {
+    if (solved[active] || !work[active]) return;
+    var s = work[active].slots;
+    if (!s[cursor] || s[cursor].locked) {
+      var f = firstUnlocked(0);
+      if (f < 0) return;
+      cursor = f;
+    }
+    s[cursor].ch = ch;
+    advanceCursor();
+    renderBoard();
+  }
+  function backspace() {
+    if (solved[active] || !work[active]) return;
+    var s = work[active].slots;
+    if (s[cursor] && !s[cursor].locked && s[cursor].ch) {
+      s[cursor].ch = "";
+      renderBoard();
+      return;
+    }
+    for (var c = cursor - 1; c >= 0; c--) {
+      if (!s[c].locked) { cursor = c; s[c].ch = ""; renderBoard(); return; }
+    }
+  }
+
+  function submit() {
+    if (solved[active] || !work[active]) return;
+    var s = work[active].slots;
+    var allFilled = s.every(function (x) { return x.locked || x.ch; });
+    if (!allFilled) { shakeAnim(); return; }
+    work[active].attempts++;
+    var att = work[active].attempts;
+    var sol = PUZZLE.rows[active].word, anyWrong = false;
+    for (var c = 0; c < s.length; c++) {
+      if (s[c].locked) continue;
+      if (s[c].ch === sol[c]) {
+        s[c].locked = true;
+        s[c].color = (att === 1 ? "green" : "yellow");  // green = first try, yellow = later
+      } else {
+        s[c].ch = "";
+        anyWrong = true;
+      }
+    }
+    if (s.every(function (x) { return x.locked; })) {
+      finishRow();
+    } else {
+      var f = firstUnlocked(0);
+      if (f >= 0) cursor = f;
+      renderBoard();
+      if (anyWrong) shakeAnim();
+    }
+  }
+  function nextUnsolved(from) {
+    for (var i = from; i < N; i++) if (!solved[i]) return i;
+    for (var j = 0; j < from; j++) if (!solved[j]) return j;
+    return -1;
+  }
+  function finishRow() {
+    var i = active;
+    solved[i] = true;
+    colors[i] = work[i].slots.map(function (x) { return x.color; });
+    work[i] = null;
+    justSolvedRow = i;
+    var nxt = nextUnsolved(i + 1);   // advance to the next remaining row (user can still re-select any)
+    if (nxt < 0) { renderBoard(); finish(); return; }
+    active = nxt;
+    var f = firstUnlocked(0);
+    cursor = f < 0 ? 0 : f;
+    renderBoard(); renderKeyboard(); renderClue();
+  }
+  function shakeAnim() {
+    var b = $("board");
+    b.classList.add("shake");
+    setTimeout(function () { b.classList.remove("shake"); }, 400);
+  }
+
+  // ── hints: reveal letters as "assisted" on the selected row ──
+  function lockAssist(idx) {
+    var s = work[active].slots;
+    s[idx].ch = PUZZLE.rows[active].word[idx];
+    s[idx].locked = true;
+    s[idx].color = "assist";
+  }
+  function hint(kind) {
+    toggleHint(false);
+    if (solved[active] || !work[active]) { toast("Pick an unsolved row first"); return; }
+    var s = work[active].slots, idx;
+    if (kind === "first") {
+      idx = s[0].locked ? firstUnlocked(0) : 0;
+      if (idx < 0) return;
+      lockAssist(idx);
+    } else if (kind === "letter") {
+      idx = (s[cursor] && !s[cursor].locked) ? cursor : firstUnlocked(0);
+      if (idx < 0) return;
+      lockAssist(idx);
+    } else if (kind === "word") {
+      for (var c = 0; c < s.length; c++) if (!s[c].locked) lockAssist(c);
+    }
+    if (s.every(function (x) { return x.locked; })) {
+      finishRow();
+    } else {
+      var f = firstUnlocked(0);
+      if (f >= 0) cursor = f;
+      renderBoard(); renderKeyboard(); renderClue();
+    }
+  }
+
+  function finish() {
+    stopTimer();
+    $("done-time").textContent = fmt(elapsed);
+    $("done-streak").textContent = (parseInt($("streak-count").textContent, 10) + 1);
+    $("done-sub").textContent = PUZZLE.dateFull;
+    renderDoneStair();
+    setTimeout(function () { show("done"); }, 820);
+  }
+
+  function renderDoneStair() {
+    var wrap = $("done-stair");
+    wrap.innerHTML = "";
+    PUZZLE.rows.forEach(function (row, i) {
+      var r = document.createElement("div");
+      r.className = "ms-row";
+      for (var c = 0; c < row.word.length; c++) {
+        var b = document.createElement("div");
+        var col = colors[i] ? colors[i][c] : "green";
+        b.className = "ms-block" + (col === "yellow" ? " yellow" : col === "assist" ? " assist" : "");
+        r.appendChild(b);
+      }
+      wrap.appendChild(r);
+    });
+  }
+
+  // ── share ── (🟩 first-try, 🟨 later-try, ⬜ revealed by hint)
+  function shareText() {
+    var lines = ["Stepwords — " + PUZZLE.title, PUZZLE.dateShort, "Solved in " + fmt(elapsed) + " ★★★", ""];
+    PUZZLE.rows.forEach(function (row, i) {
+      var s = "";
+      for (var c = 0; c < row.word.length; c++) {
+        var col = colors[i] ? colors[i][c] : "green";
+        s += col === "yellow" ? "🟨" : col === "assist" ? "⬜" : "🟩";
+      }
+      lines.push(s);
+    });
+    return lines.join("\n");
+  }
+  function toast(msg) {
+    var t = $("toast");
+    t.textContent = msg;
+    t.classList.add("show");
+    setTimeout(function () { t.classList.remove("show"); }, 1900);
+  }
+
+  // ── how-to modal ──
+  var panelIdx = 0;
+  function openHowto() {
+    panelIdx = 0; updatePanels(); $("howto").classList.add("open");
+  }
+  function closeHowto() { $("howto").classList.remove("open"); }
+  function updatePanels() {
+    var panels = document.querySelectorAll(".panel");
+    var dots = $("modal-dots").children;
+    for (var i = 0; i < panels.length; i++) {
+      panels[i].classList.toggle("active", i === panelIdx);
+      dots[i].classList.toggle("on", i === panelIdx);
+    }
+    $("modal-next").textContent = (panelIdx === panels.length - 1) ? "Play" : "Next";
+    $("modal-skip").style.visibility = (panelIdx === panels.length - 1) ? "hidden" : "visible";
+  }
+  function nextPanel() {
+    var total = document.querySelectorAll(".panel").length;
+    if (panelIdx < total - 1) { panelIdx++; updatePanels(); }
+    else { closeHowto(); startGame(); }
+  }
+
+  // ── menu ──
+  function toggleMenu(force) {
+    var m = $("menu-pop");
+    if (typeof force === "boolean") m.classList.toggle("open", force);
+    else m.classList.toggle("open");
+  }
+  function toggleHint(force) {
+    var m = $("hint-pop");
+    if (typeof force === "boolean") m.classList.toggle("open", force);
+    else m.classList.toggle("open");
+  }
+  function toggleInfo(force) {
+    var m = $("info-modal");
+    if (typeof force === "boolean") m.classList.toggle("open", force);
+    else m.classList.toggle("open");
+  }
+
+  // ══════════════ ARCHIVE ══════════════
+  var STAR_SVG = '<svg viewBox="0 0 640 640"><path d="M341.5 45.1C337.4 37.1 329.1 32 320.1 32C311.1 32 302.8 37.1 298.7 45.1L225.1 189.3L65.2 214.7C56.3 216.1 48.9 222.4 46.1 231C43.3 239.6 45.6 249 51.9 255.4L166.3 369.9L141.1 529.8C139.7 538.7 143.4 547.7 150.7 553C158 558.3 167.6 559.1 175.7 555L320.1 481.6L464.4 555C472.4 559.1 482.1 558.3 489.4 553C496.7 547.7 500.4 538.8 499 529.8L473.7 369.9L588.1 255.4C594.5 249 596.7 239.6 593.9 231C591.1 222.4 583.8 216.1 574.8 214.7L415 189.3L341.5 45.1z"/></svg>';
+  var X_SVG = '<svg viewBox="0 0 384 512" fill="#c2402f"><path d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z"/></svg>';
+  var MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+  var archYear, archMonth, archMode = "main";
+
+  // deterministic dummy result for a past day (so the demo is stable)
+  function dayStatus(mode, year, month, day) {
+    var seed = (day * 7 + month * 3 + (mode === "main" ? 1 : 5)) % 11;
+    if (seed === 3 || seed === 8) return { state: "none" };        // skipped
+    if (seed === 6) return { state: "failed" };
+    if (seed === 9) return { state: "progress" };
+    return { state: "completed", stars: (day + (mode === "main" ? 0 : 1)) % 3 + 1 };
+  }
+
+  function renderArchive() {
+    $("arch-month").textContent = MONTHS[archMonth] + " " + archYear;
+    var seg = $("arch-seg").children;
+    for (var s = 0; s < seg.length; s++) seg[s].classList.toggle("active", seg[s].dataset.mode === archMode);
+
+    var grid = $("arch-grid");
+    grid.innerHTML = "";
+    var firstWeekday = new Date(archYear, archMonth, 1).getDay();
+    var daysInMonth = new Date(archYear, archMonth + 1, 0).getDate();
+    var now = new Date(), ty = now.getFullYear(), tm = now.getMonth(), td = now.getDate();
+
+    for (var b = 0; b < firstWeekday; b++) {
+      var blank = document.createElement("div");
+      blank.className = "day blank";
+      grid.appendChild(blank);
+    }
+    for (var d = 1; d <= daysInMonth; d++) {
+      var cell = document.createElement("div");
+      cell.className = "day";
+      var isFuture = (archYear > ty) || (archYear === ty && archMonth > tm) || (archYear === ty && archMonth === tm && d > td);
+      var isToday = (archYear === ty && archMonth === tm && d === td);
+      var inner = '<span class="dnum">' + d + "</span>";
+
+      if (isFuture) {
+        cell.classList.add("future");
+      } else {
+        var st = isToday ? { state: "progress" } : dayStatus(archMode, archYear, archMonth, d);
+        if (st.state === "completed") {
+          cell.classList.add("completed");
+          var pips = "";
+          for (var p = 0; p < st.stars; p++) pips += STAR_SVG;
+          inner += '<span class="pips">' + pips + "</span>";
+        } else if (st.state === "failed") {
+          cell.classList.add("failed");
+          inner += '<span class="xmark">' + X_SVG + "</span>";
+        } else if (st.state === "progress") {
+          cell.classList.add("progress");
+          inner += '<span class="dot"></span>';
+        } else {
+          cell.classList.add("empty");
+        }
+        cell.dataset.day = d;
+      }
+      if (isToday) cell.classList.add("today");
+      cell.innerHTML = inner;
+      grid.appendChild(cell);
+    }
+  }
+
+  function openArchive() {
+    if (archYear === undefined) { var n = new Date(); archYear = n.getFullYear(); archMonth = n.getMonth(); }
+    renderArchive();
+    show("archive");
+  }
+  function archShift(delta) {
+    archMonth += delta;
+    if (archMonth < 0) { archMonth = 11; archYear--; }
+    else if (archMonth > 11) { archMonth = 0; archYear++; }
+    renderArchive();
+  }
+
+  // ── wiring ──
+  $("hero-card").addEventListener("click", startGame);
+  $("quick-card").addEventListener("click", startGame);
+  $("create-card").addEventListener("click", function () { toast("Create — coming soon"); });
+  $("footer-stats").addEventListener("click", function () { toast("Stats — coming soon"); });
+  $("footer-archives").addEventListener("click", openArchive);
+  $("arch-back").addEventListener("click", function () { show("home"); });
+  $("arch-prev").addEventListener("click", function () { archShift(-1); });
+  $("arch-next").addEventListener("click", function () { archShift(1); });
+  $("arch-seg").addEventListener("click", function (e) {
+    var b = e.target.closest(".seg-btn");
+    if (b) { archMode = b.dataset.mode; renderArchive(); }
+  });
+  $("arch-grid").addEventListener("click", function (e) {
+    var cell = e.target.closest(".day");
+    if (cell && cell.dataset.day) { toast(MONTHS[archMonth] + " " + cell.dataset.day + " — opening puzzle"); startGame(); }
+  });
+  $("footer-howto").addEventListener("click", openHowto);
+
+  $("game-back").addEventListener("click", function () { stopTimer(); toggleMenu(false); toggleHint(false); show("home"); });
+  $("menu-toggle").addEventListener("click", function (e) { e.stopPropagation(); toggleHint(false); toggleMenu(); });
+  $("menu-howto").addEventListener("click", function () { toggleMenu(false); openHowto(); });
+  $("menu-quit").addEventListener("click", function () { toggleMenu(false); stopTimer(); show("home"); });
+  $("hint-btn").addEventListener("click", function (e) { e.stopPropagation(); toggleMenu(false); toggleHint(); });
+  $("info-btn").addEventListener("click", function (e) { e.stopPropagation(); toggleMenu(false); toggleHint(false); toggleInfo(true); });
+  $("info-done").addEventListener("click", function () { toggleInfo(false); });
+  $("info-modal").addEventListener("click", function (e) { if (e.target === this) toggleInfo(false); });
+  $("hint-first").addEventListener("click", function () { hint("first"); });
+  $("hint-letter").addEventListener("click", function () { hint("letter"); });
+  $("hint-word").addEventListener("click", function () { hint("word"); });
+  document.addEventListener("click", function () { toggleMenu(false); toggleHint(false); });
+
+  $("clue-prev").addEventListener("click", function () { selectRow(Math.max(0, active - 1)); });
+  $("clue-next").addEventListener("click", function () { selectRow(Math.min(N - 1, active + 1)); });
+
+  $("keyboard").addEventListener("click", function (e) {
+    var k = e.target.closest(".key");
+    if (!k) return;
+    if (k.dataset.action === "submit") submit();
+    else if (k.dataset.action === "back") backspace();
+    else if (k.dataset.letter) type(k.dataset.letter);
+  });
+
+  // click any unsolved cell to select that row and position the cursor
+  $("board").addEventListener("click", function (e) {
+    var cell = e.target.closest(".cell");
+    if (!cell || cell.dataset.row === undefined) return;
+    selectRow(parseInt(cell.dataset.row, 10), parseInt(cell.dataset.col, 10));
+  });
+
+  document.addEventListener("keydown", function (e) {
+    if (!$("screen-game").classList.contains("active")) return;
+    if (e.key === "Enter") { submit(); e.preventDefault(); }
+    else if (e.key === "Backspace") { backspace(); e.preventDefault(); }
+    else if (/^[a-zA-Z]$/.test(e.key)) { type(e.key.toUpperCase()); }
+  });
+
+  $("share-btn").addEventListener("click", function () {
+    var txt = shareText();
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(txt).then(function () { toast("Copied to clipboard!"); },
+        function () { toast("Copy failed"); });
+    } else { toast("Copied to clipboard!"); }
+  });
+  $("done-home").addEventListener("click", function () { show("home"); });
+
+  $("modal-next").addEventListener("click", nextPanel);
+  $("modal-skip").addEventListener("click", function () { closeHowto(); });
+
+  // ── capture deep-links: ?capture=1 suppresses the how-to; ?screen=game|done jumps a screen ──
+  var _params = new URLSearchParams(location.search);
+  var _capture = _params.has("capture");
+  var _screen = _params.get("screen");
+  var _modal = _params.get("modal");
+
+  // ── first-visit gate (skipped during capture) ──
+  try {
+    if (!_capture && !localStorage.getItem("sw_seen_howto")) {
+      openHowto();
+      localStorage.setItem("sw_seen_howto", "1");
+    }
+  } catch (err) { /* localStorage blocked */ }
+
+  if (_screen === "game") {
+    startGame();
+  } else if (_screen === "done") {
+    startGame();
+    for (var _i = 0; _i < N; _i++) {
+      solved[_i] = true;
+      colors[_i] = PUZZLE.rows[_i].word.split("").map(function () { return "green"; });
+      work[_i] = null;
+    }
+    elapsed = 184;
+    finish();
+    show("done");
+  }
+
+  if (_modal === "howto") {
+    openHowto();                 // onboarding overlay over the home screen
+  } else if (_modal === "info") {
+    startGame();                 // info/credits overlay over the game screen
+    toggleInfo(true);
+  }
+
+})();
+</script>
+</body>
+</html>

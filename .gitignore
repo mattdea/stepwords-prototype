@@ -1,0 +1,12 @@
+# macOS
+.DS_Store
+
+# Editor / tooling
+.claude/
+.superpowers/
+.netlify/
+
+# Internal design artifacts — not part of the deployed prototype
+design-explorations/
+HANDOFF.md
+stepwords_current.png

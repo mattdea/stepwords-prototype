@@ -1,0 +1,9 @@
+# Static site — no build step. Netlify serves files from the repo root.
+[build]
+  publish = "."
+
+# Friendly path: /app -> the responsive app (in addition to /app.html)
+[[redirects]]
+  from = "/app"
+  to = "/app.html"
+  status = 200
