@@ -25,7 +25,11 @@ const REACT_DOM_CDN =
   "https://unpkg.com/react-dom@18/umd/react-dom.production.min.js";
 
 const esc = (js) => js.replace(/<\/script>/gi, "<\\/script>");
+const escCss = (css) => css.replace(/<\/style>/gi, "<\\/style>");
 const bundleJs = readFileSync(join(BUNDLE, "_ds_bundle.js"), "utf8");
+// The full compiled design-system CSS (remote font @imports + tokens + every
+// component rule). The wrapper styles.css just @imports this file.
+const bundleCss = readFileSync(join(BUNDLE, "_ds_bundle.css"), "utf8");
 
 const compRoot = join(BUNDLE, "components");
 let patched = 0;
@@ -42,6 +46,15 @@ for (const group of readdirSync(compRoot)) {
       : "";
 
     html = html
+      // inline the stylesheet (relative <link>s don't resolve in the pane)
+      .replace(
+        /<link rel="stylesheet" href="\.\.\/\.\.\/\.\.\/styles\.css">/,
+        `<style>${escCss(bundleCss)}</style>`,
+      )
+      .replace(
+        /\s*<link rel="stylesheet" href="\.\.\/\.\.\/\.\.\/_ds_bundle\.css">/,
+        "",
+      )
       .replace(
         /<script src="\.\.\/\.\.\/\.\.\/_vendor\/react\.js"><\/script>/,
         `<script crossorigin src="${REACT_CDN}"></script>`,
