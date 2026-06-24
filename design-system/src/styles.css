@@ -2,7 +2,7 @@
    Original class names and exact rules are preserved so components render
    pixel-identically to the prototype. Fonts load from their hosts at runtime. */
 @import url("https://use.typekit.net/cst1gej.css");
-@import url("https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@300;400;500;600&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@300;400;500;600&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&display=swap");
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
 :root {
@@ -23,7 +23,10 @@
   --green: #6dc68f;   /* solved first try */
   --yellow: #e3b13e;  /* solved on a later try */
   --assist: #b7c0cb;  /* revealed by a hint */
-  --serif: "kazimirtext", serif;
+  /* Kazimir is the brand serif (Adobe Typekit, loads only on stepwords' own
+     domains). Newsreader is a self-hostable open stand-in so the serif still
+     renders in environments where Kazimir can't load (e.g. Claude Design). */
+  --serif: "kazimirtext", "Newsreader", Georgia, serif;
   --sans: "Libre Franklin", sans-serif;
   --cell: 32px;
 }
