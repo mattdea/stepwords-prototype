@@ -13,13 +13,13 @@ export interface KeyProps {
   onClick?: () => void;
 }
 
-/** A single keyboard key. */
+/** A single keyboard key (prototype `.key`). */
 export function Key({ label, available, wide, submit, onClick }: KeyProps) {
   const classes = [
-    "sw-key",
-    available ? "sw-key--avail" : "",
-    wide ? "sw-key--wide" : "",
-    submit ? "sw-key--submit" : "",
+    "key",
+    available ? "avail" : "",
+    wide ? "wide" : "",
+    submit ? "submit" : "",
   ]
     .filter(Boolean)
     .join(" ");
@@ -43,9 +43,9 @@ export interface KeyboardProps {
 }
 
 /**
- * The on-screen QWERTY keyboard. Available letters read at full ink; the rest
- * dim back, which in play signals which letters are still in the pool. The
- * accent Enter key submits.
+ * The on-screen QWERTY keyboard (prototype `.keyboard`). Available letters read
+ * at full ink; the rest dim back, which in play signals which letters are still
+ * in the pool. The accent Enter key submits.
  */
 export function Keyboard({
   available,
@@ -55,11 +55,13 @@ export function Keyboard({
   onDelete,
   className,
 }: KeyboardProps) {
-  const avail = available ? new Set(available.map((c) => c.toUpperCase())) : null;
+  const avail = available
+    ? new Set(available.map((c) => c.toUpperCase()))
+    : null;
   return (
-    <div className={["sw-keyboard", className].filter(Boolean).join(" ")}>
+    <div className={["keyboard", className].filter(Boolean).join(" ")}>
       {ROWS.map((row, ri) => (
-        <div className="sw-kb-row" key={ri}>
+        <div className="kb-row" key={ri}>
           {ri === ROWS.length - 1 && showActions && (
             <Key label="Enter" wide submit onClick={onEnter} />
           )}

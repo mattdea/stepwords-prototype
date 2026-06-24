@@ -14,10 +14,19 @@ export interface ButtonProps
   children?: ReactNode;
 }
 
+// Maps the component's variants onto the prototype's original class names so
+// the rendered markup is identical to app.html.
+function classFor(variant: ButtonVariant, compact: boolean): string {
+  if (variant === "icon") return "icon-square";
+  if (variant === "text") return "home-link";
+  return compact ? "home-play" : "play-btn";
+}
+
 /**
  * The one button in the system. Three variants cover every action surface:
- * the accent pill (Play / Submit / Share), the paper icon square (back,
- * overflow, hint), and the quiet text link (footer, back-to-home).
+ * the accent pill (Play / Submit / Share — `play-btn`, or the tighter
+ * `home-play` with `compact`), the paper icon square (`icon-square`), and the
+ * quiet text link (`home-link`).
  */
 export function Button({
   variant = "primary",
@@ -28,12 +37,7 @@ export function Button({
   type = "button",
   ...rest
 }: ButtonProps) {
-  const classes = [
-    "sw-btn",
-    `sw-btn--${variant}`,
-    compact && variant === "primary" ? "sw-btn--compact" : "",
-    className ?? "",
-  ]
+  const classes = [classFor(variant, compact), className]
     .filter(Boolean)
     .join(" ");
 

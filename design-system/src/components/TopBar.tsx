@@ -1,6 +1,5 @@
 import type { ReactNode } from "react";
-import { Button } from "./Button";
-import { ChevronLeftIcon, InfoIcon, EllipsisIcon } from "../icons";
+import { ArrowRightIcon, InfoIcon, EllipsisIcon } from "../icons";
 
 export interface TopBarProps {
   /** Centered title (e.g. "Stepwords"). Stays centered regardless of the
@@ -20,9 +19,9 @@ export interface TopBarProps {
 }
 
 /**
- * The game header: a centered serif title (with optional date) flanked by
- * paper icon buttons. The title is absolutely centered so it never shifts when
- * the side actions change width.
+ * The game header (prototype `.game-top`): a centered serif title (with
+ * optional date) flanked by paper icon buttons. The title is absolutely
+ * centered so it never shifts when the side actions change width.
  */
 export function TopBar({
   title,
@@ -34,38 +33,30 @@ export function TopBar({
   className,
 }: TopBarProps) {
   return (
-    <div className={["sw-topbar", className].filter(Boolean).join(" ")}>
-      <div className="sw-topbar__actions">
+    <div className={["game-top", className].filter(Boolean).join(" ")}>
+      <div className="top-actions">
         {onBack && (
-          <Button
-            variant="icon"
-            aria-label="Back"
-            icon={<ChevronLeftIcon />}
-            onClick={onBack}
-          />
+          <button type="button" className="icon-square" aria-label="Back" onClick={onBack}>
+            {/* the prototype mirrors the right-arrow glyph for "back" */}
+            <ArrowRightIcon width={14} height={14} style={{ transform: "scaleX(-1)" }} />
+          </button>
         )}
       </div>
-      <div className="sw-topbar__title-wrap">
-        <span className="sw-topbar__title">{title}</span>
-        {subtitle && <span className="sw-topbar__date">{subtitle}</span>}
+      <div className="title-wrap">
+        <span className="title">{title}</span>
+        {subtitle && <span className="game-date">{subtitle}</span>}
       </div>
-      <div className="sw-topbar__actions">
+      <div className="top-actions">
         {actions}
         {onInfo && (
-          <Button
-            variant="icon"
-            aria-label="Info"
-            icon={<InfoIcon />}
-            onClick={onInfo}
-          />
+          <button type="button" className="icon-square" aria-label="Info" onClick={onInfo}>
+            <InfoIcon width={6} height={16} />
+          </button>
         )}
         {onMenu && (
-          <Button
-            variant="icon"
-            aria-label="More"
-            icon={<EllipsisIcon />}
-            onClick={onMenu}
-          />
+          <button type="button" className="icon-square menu-dots" aria-label="More" onClick={onMenu}>
+            <EllipsisIcon width={16} height={16} />
+          </button>
         )}
       </div>
     </div>

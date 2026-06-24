@@ -1,4 +1,3 @@
-import { Button } from "./Button";
 import { ChevronLeftIcon, ChevronRightIcon } from "../icons";
 
 export interface ClueBarProps {
@@ -12,28 +11,29 @@ export interface ClueBarProps {
 }
 
 /**
- * The clue bar docked above the keyboard. Arrows step between rows; the serif
- * clue sits centered with its answer length called out in muted ink.
+ * The clue bar docked above the keyboard (prototype `.clue-bar`). Arrows step
+ * between rows; the serif clue sits centered with its answer length called out
+ * in muted ink.
  */
-export function ClueBar({ clue, length, onPrev, onNext, className }: ClueBarProps) {
+export function ClueBar({
+  clue,
+  length,
+  onPrev,
+  onNext,
+  className,
+}: ClueBarProps) {
   return (
-    <div className={["sw-clue-bar", className].filter(Boolean).join(" ")}>
-      <Button
-        variant="icon"
-        aria-label="Previous clue"
-        icon={<ChevronLeftIcon />}
-        onClick={onPrev}
-      />
-      <span className="sw-clue-bar__text">
+    <div className={["clue-bar", className].filter(Boolean).join(" ")}>
+      <button type="button" className="arrow" aria-label="Previous clue" onClick={onPrev}>
+        <ChevronLeftIcon width={14} height={14} />
+      </button>
+      <span className="clue-text">
         {clue}
-        {length != null && <span className="sw-clue-bar__len"> ({length})</span>}
+        {length != null && <span className="len"> ({length})</span>}
       </span>
-      <Button
-        variant="icon"
-        aria-label="Next clue"
-        icon={<ChevronRightIcon />}
-        onClick={onNext}
-      />
+      <button type="button" className="arrow" aria-label="Next clue" onClick={onNext}>
+        <ChevronRightIcon width={14} height={14} />
+      </button>
     </div>
   );
 }

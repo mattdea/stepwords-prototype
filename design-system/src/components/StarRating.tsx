@@ -11,9 +11,9 @@ export interface StarRatingProps {
 }
 
 /**
- * The gold three-star rating shown in the stats bar, completion strip, and
- * archive day cells. Filled stars are gold; the rest fade to the faint ink
- * tint so the rating reads at a glance.
+ * The gold star rating shown in the stats bar, completion strip, and archive
+ * day cells. Renders the prototype's `.stars` row: filled stars are gold; any
+ * remainder fades to the faint ink tint.
  */
 export function StarRating({
   value,
@@ -23,7 +23,7 @@ export function StarRating({
 }: StarRatingProps) {
   return (
     <span
-      className={["sw-stars", className].filter(Boolean).join(" ")}
+      className={["stars", className].filter(Boolean).join(" ")}
       role="img"
       aria-label={`${value} of ${max} stars`}
     >
@@ -32,7 +32,7 @@ export function StarRating({
           key={i}
           width={size}
           height={size}
-          className={i < value ? undefined : "sw-star--off"}
+          className={i < value ? undefined : "star-off"}
         />
       ))}
     </span>

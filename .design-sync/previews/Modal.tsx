@@ -31,8 +31,9 @@ export const HowToPlay = () => (
 
 export const Info = () => (
   <Frame>
-    <Modal title="Stepwords">
-      A daily anagram-ladder game. By Ben Reich.
+    <Modal info title="Stepwords">
+      Today's puzzle was created and submitted by Ben Reich. Anyone can submit a
+      Stepwords puzzle at stepwords.xyz.
     </Modal>
   </Frame>
 );

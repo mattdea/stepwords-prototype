@@ -17,20 +17,31 @@ export interface CellProps {
   onClick?: () => void;
 }
 
+// Maps a cell state onto the prototype's exact class list (`cell solved green`,
+// `cell active cursor`, `cell empty`, …).
+function cellClass(state: CellState): string {
+  switch (state) {
+    case "green":
+      return "cell solved green";
+    case "yellow":
+      return "cell solved yellow";
+    case "assist":
+      return "cell solved assist";
+    case "cursor":
+      return "cell active cursor";
+    case "active":
+      return "cell active";
+    default:
+      return "cell empty";
+  }
+}
+
 /** A single board square. */
 export function Cell({ letter, state = "empty", marker, onClick }: CellProps) {
-  const solved = state === "green" || state === "yellow" || state === "assist";
-  const classes = [
-    "sw-cell",
-    solved ? "sw-cell--solved" : "",
-    `sw-cell--${state}`,
-  ]
-    .filter(Boolean)
-    .join(" ");
   return (
-    <div className={classes} onClick={onClick}>
+    <div className={cellClass(state)} onClick={onClick}>
       {letter}
-      {marker && <StairsIcon className="sw-stairs" />}
+      {marker && <StairsIcon className="stairs" />}
     </div>
   );
 }
@@ -69,25 +80,17 @@ export function StaircaseBoard({
   onCellClick,
   className,
 }: StaircaseBoardProps) {
-  const longest = maxLen ?? rows.reduce((m, r) => Math.max(m, r.letters.length), 0);
+  const longest =
+    maxLen ?? rows.reduce((m, r) => Math.max(m, r.letters.length), 0);
   return (
     <div
-      className={["sw-board", className].filter(Boolean).join(" ")}
+      className={["board", className].filter(Boolean).join(" ")}
       style={{ ["--maxlen" as string]: String(longest) }}
     >
       {rows.map((row, ri) => (
-        <div className="sw-board__row" key={ri}>
+        <div className="row" key={ri}>
           {showNumbers && (
-            <span
-              className={[
-                "sw-board__num",
-                row.selected ? "sw-board__num--sel" : "",
-              ]
-                .filter(Boolean)
-                .join(" ")}
-            >
-              {ri + 1}
-            </span>
+            <span className={row.selected ? "num sel" : "num"}>{ri + 1}</span>
           )}
           {row.letters.map((letter, ci) => (
             <Cell

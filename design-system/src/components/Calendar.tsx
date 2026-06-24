@@ -28,31 +28,31 @@ export interface CalendarProps {
 
 const DEFAULT_WEEKDAYS = ["S", "M", "T", "W", "T", "F", "S"];
 
-/** A day cell's status indicator (stars / dot / x). */
+/** A day cell's status indicator (stars / dot / x), prototype `.pips`/`.dot`/`.xmark`. */
 function DayMark({ day }: { day: CalendarDay }) {
   if (day.status === "completed") {
     return (
-      <span className="sw-day__pips">
+      <span className="pips">
         {Array.from({ length: day.stars ?? 0 }, (_, i) => (
-          <StarIcon key={i} />
+          <StarIcon key={i} viewBox="0 0 640 640" />
         ))}
       </span>
     );
   }
-  if (day.status === "progress") return <span className="sw-day__dot" />;
+  if (day.status === "progress") return <span className="dot" />;
   if (day.status === "failed")
     return (
-      <span className="sw-day__x">
+      <span className="xmark">
         <XmarkIcon />
       </span>
     );
-  return <span className="sw-day__pips" />;
+  return <span className="pips" />;
 }
 
 /**
- * The archive month calendar. Each day cell carries one of four play states —
- * completed (gold stars), in-progress (dot), failed (x), or untouched — and
- * today gets an accent ring.
+ * The archive month calendar (prototype `.arch-cal`). Each day cell carries one
+ * of four play states — completed (gold stars), in-progress (dot), failed (x),
+ * or untouched — and today gets an accent ring.
  */
 export function Calendar({
   days,
@@ -61,21 +61,17 @@ export function Calendar({
   className,
 }: CalendarProps) {
   return (
-    <div className={["sw-cal", className].filter(Boolean).join(" ")}>
-      <div className="sw-cal__weekdays">
+    <div className={["arch-cal", className].filter(Boolean).join(" ")}>
+      <div className="arch-weekdays">
         {weekdays.map((w, i) => (
           <span key={i}>{w}</span>
         ))}
       </div>
-      <div className="sw-cal__grid">
+      <div className="arch-grid">
         {days.map((d, i) => {
-          if (d.day == null) return <div key={i} />;
+          if (d.day == null) return <div className="day blank" key={i} />;
           const status = d.status ?? "none";
-          const classes = [
-            "sw-day",
-            `sw-day--${status}`,
-            d.today ? "sw-day--today" : "",
-          ]
+          const classes = ["day", status, d.today ? "today" : ""]
             .filter(Boolean)
             .join(" ");
           return (
@@ -86,7 +82,7 @@ export function Calendar({
                 status !== "future" && d.day != null && onSelectDay?.(d.day)
               }
             >
-              <span className="sw-day__num">{d.day}</span>
+              <span className="dnum">{d.day}</span>
               <DayMark day={d} />
             </div>
           );

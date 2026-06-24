@@ -8,8 +8,9 @@ export interface SegmentedToggleProps {
 }
 
 /**
- * The pill segmented control (Main / Quick) above the archive calendar. The
- * active segment lifts onto paper; the rest stay quiet.
+ * The pill segmented control (Main / Quick) above the archive calendar
+ * (prototype `.seg` > `.seg-btn`). The active segment lifts onto paper; the
+ * rest stay quiet.
  */
 export function SegmentedToggle({
   options,
@@ -18,19 +19,14 @@ export function SegmentedToggle({
   className,
 }: SegmentedToggleProps) {
   return (
-    <div className={["sw-seg", className].filter(Boolean).join(" ")} role="tablist">
+    <div className={["seg", className].filter(Boolean).join(" ")} role="tablist">
       {options.map((opt) => (
         <button
           key={opt}
           type="button"
           role="tab"
           aria-selected={opt === value}
-          className={[
-            "sw-seg__btn",
-            opt === value ? "sw-seg__btn--active" : "",
-          ]
-            .filter(Boolean)
-            .join(" ")}
+          className={opt === value ? "seg-btn active" : "seg-btn"}
           onClick={() => onChange?.(opt)}
         >
           {opt}
