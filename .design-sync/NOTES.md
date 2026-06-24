@@ -20,6 +20,31 @@ Repo-specific gotchas for future syncs of the Stepwords design system.
 
 - `cfg.overrides.Modal = {cardMode: "column"}` — the Modal previews are 380px framed overlays, wider than a grid cell; column mode gives each story full card width. Applied to clear `[GRID_OVERFLOW]`.
 
+## Self-contained preview cards (REQUIRED before every upload)
+
+The converter emits preview cards that load React + the bundle via **relative**
+script srcs (`../../../_vendor/react.js`, `../../../_ds_bundle.js`,
+`../../../_preview/<Name>.js`). Those do NOT resolve in the claude.ai/design
+**thumbnail/list renderer**, so cards show **blank** there (the live Edit view
+serves them differently and works). Confirmed root cause via the Design agent.
+
+Fix: `.design-sync/scripts/selfcontain-cards.mjs` rewrites each card to load
+React/ReactDOM from a CDN and inline the bundle + preview. **Run it as the LAST
+step after `package-build.mjs`/validate and immediately before upload:**
+
+```
+node .design-sync/scripts/selfcontain-cards.mjs ./ds-bundle
+```
+
+- It changes only the card `<Name>.html` files; do NOT re-run validate after it
+  (the build anchor `_ds_sync.json` is computed from the unpatched htmls, so a
+  post-patch validate prints a benign `[SYNC_STALE]`). Upload the patched htmls;
+  leave the anchor as the build wrote it (it stays consistent across syncs
+  because the patch is always applied identically after an unpatched build).
+- On re-sync: build → validate → **run this script** → upload. If you skip it,
+  the blank-thumbnail bug returns.
+- Verified 14/14 cards still render with the CDN React in the headless check.
+
 ## Re-sync risks (what can silently go stale)
 
 - **Sub-part components as cards.** `Cell`, `Key`, `StairGlyph`, `CreateGlyph` are exported and each gets its own card. If they should be hidden from the picker later, exclude via `componentSrcMap: {"<Name>": null}`.
