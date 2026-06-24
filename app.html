@@ -172,14 +172,21 @@
   .game-stats .timer { font-variant-numeric: tabular-nums; font-weight: 500; }
   .game-stats .spacer { flex: 1; }
 
-  .board { flex: 1; padding: 18px 16px 12px; display: flex; flex-direction: column; gap: 5px; }
+  .board {
+    flex: 1; padding: 18px 16px 12px; display: flex; flex-direction: column; gap: 5px;
+    container-type: inline-size;        /* cells size to the board's width */
+    --num-gutter: 22px; --cgap: 4px; --maxlen: 7;
+  }
   .board.shake { animation: shake .4s; }
   @keyframes shake { 0%,100%{transform:translateX(0)} 20%,60%{transform:translateX(-6px)} 40%,80%{transform:translateX(6px)} }
   .row { display: flex; align-items: center; gap: 4px; }
-  .row .num { width: 18px; margin-right: 4px; font-size: 11px; color: var(--ink-25); text-align: right; font-variant-numeric: tabular-nums; }
+  .row .num { width: 18px; flex-shrink: 0; margin-right: 4px; font-size: 11px; color: var(--ink-25); text-align: right; font-variant-numeric: tabular-nums; }
   .row .num.sel { background: var(--accent); color: #fff; border-radius: 5px; text-align: center; padding: 3px 0; }
   .cell {
-    width: var(--cell); height: var(--cell); display: flex; align-items: center; justify-content: center;
+    /* shrink to fit the longest row when it would overflow, else use --cell */
+    width: min(var(--cell), calc((100cqw - var(--num-gutter) - (var(--maxlen) - 1) * var(--cgap)) / var(--maxlen)));
+    aspect-ratio: 1; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
     font-family: var(--serif); font-weight: 600; font-size: 17px; border-radius: 6px; position: relative;
   }
   .cell.solved { border: 1px solid var(--ink-25); background: var(--bg); }
@@ -414,7 +421,7 @@
     .row { gap: 6px; }
     .row .num { width: 26px; margin-right: 6px; font-size: 13px; }
     .row .num.sel { border-radius: 6px; padding: 4px 0; }
-    .board { padding: 26px 30px 14px; gap: 7px; }
+    .board { padding: 26px 30px 14px; gap: 7px; --num-gutter: 32px; --cgap: 6px; }
     .cell .stairs { width: 13px; height: 13px; }
 
     /* game chrome */
@@ -672,11 +679,14 @@
     dateShort: "Sunday, June 22",
     dateFull: "Sunday, June 22, 2026",
     rows: [
-      { word: "EAT",     clue: "Have a meal",          start: true },
-      { word: "RATE",    clue: "Speed or charge",      newLetter: "R" },
-      { word: "TEARS",   clue: "Drops from crying",    newLetter: "S" },
-      { word: "STARED",  clue: "Looked fixedly",       newLetter: "D" },
-      { word: "ASTRIDE", clue: "Legs on either side",  newLetter: "I" }
+      { word: "EAT",        clue: "Have a meal",           start: true },
+      { word: "RATE",       clue: "Speed or charge",       newLetter: "R" },
+      { word: "TEARS",      clue: "Drops from crying",     newLetter: "S" },
+      { word: "STARED",     clue: "Looked fixedly",        newLetter: "D" },
+      { word: "ASTRIDE",    clue: "Legs on either side",   newLetter: "I" },
+      { word: "STRAINED",   clue: "Tense, as relations",   newLetter: "N" },
+      { word: "GRADIENTS",  clue: "Slopes or inclines",    newLetter: "G" },
+      { word: "DENIGRATES", clue: "Belittles unfairly",    newLetter: "E" }
     ]
   };
 
@@ -852,6 +862,9 @@
     work[0] = null;
     active = 1; cursor = 0;
     elapsed = 0; justSolvedRow = -1;
+    // size the board cells to the longest word in this puzzle
+    var maxLen = PUZZLE.rows.reduce(function (m, r) { return Math.max(m, r.word.length); }, 0);
+    $("board").style.setProperty("--maxlen", maxLen);
     $("timer").textContent = "0:00";
     renderStars();
     renderBoard();
