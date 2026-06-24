@@ -1,6 +1,7 @@
 {
   "pkg": "@stepwords/design-system",
   "globalName": "StepwordsDS",
+  "projectId": "b495ab2d-3b6c-4056-8ee3-8485f0de3f4b",
   "shape": "package",
   "buildCmd": "npm run build",
   "cssEntry": "dist/stepwords-ds.css",
