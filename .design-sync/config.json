@@ -1,0 +1,11 @@
+{
+  "pkg": "@stepwords/design-system",
+  "globalName": "StepwordsDS",
+  "shape": "package",
+  "buildCmd": "npm run build",
+  "cssEntry": "dist/stepwords-ds.css",
+  "readmeHeader": ".design-sync/conventions.md",
+  "overrides": {
+    "Modal": { "cardMode": "column" }
+  }
+}

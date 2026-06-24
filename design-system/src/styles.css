@@ -1,0 +1,572 @@
+/* Stepwords design system — fonts, tokens, and component styles.
+   Ported verbatim from the app.html prototype so the design agent renders
+   the real look. Fonts load from their hosts at runtime (Typekit + Google). */
+@import url("https://use.typekit.net/cst1gej.css");
+@import url("https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@300;400;500;600&display=swap");
+
+:root {
+  --paper: #fdfcf8;
+  --bg: #f4f2ea;
+  --ink: #171410;
+  --ink-65: rgba(23, 20, 16, 0.65);
+  --ink-45: #6c6c6c; /* muted text — solid for AA contrast */
+  --ink-25: rgba(23, 20, 16, 0.25);
+  --ink-14: rgba(23, 20, 16, 0.14);
+  --ink-08: rgba(23, 20, 16, 0.08);
+  --accent: #1d3f6e;
+  --accent-hover: #244e87;
+  --accent-press: #16314f;
+  --accent-light: rgba(29, 63, 110, 0.12);
+  --gold: #e2c044;
+  --gold-light: rgba(197, 150, 10, 0.1);
+  --green: #6dc68f; /* solved first try */
+  --yellow: #e3b13e; /* solved on a later try */
+  --assist: #b7c0cb; /* revealed by a hint */
+  --serif: "kazimirtext", Georgia, serif;
+  --sans: "Libre Franklin", system-ui, sans-serif;
+  --cell: 32px;
+}
+
+/* ── Button ─────────────────────────────────────────────── */
+.sw-btn {
+  font-family: var(--sans);
+  cursor: pointer;
+  border: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  transition: background 0.15s ease, transform 0.07s ease, box-shadow 0.15s ease,
+    color 0.15s ease;
+}
+.sw-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+/* primary — accent-filled pill (Play / Submit / Share / Next) */
+.sw-btn--primary {
+  background: var(--accent);
+  color: #fff;
+  font-weight: 600;
+  font-size: 14px;
+  padding: 11px 32px;
+  border-radius: 24px;
+  letter-spacing: 0.02em;
+}
+.sw-btn--primary:not(:disabled):hover {
+  background: var(--accent-hover);
+}
+.sw-btn--primary:not(:disabled):active {
+  background: var(--accent-press);
+  transform: translateY(1px) scale(0.985);
+}
+/* compact primary (home Play) */
+.sw-btn--compact {
+  padding: 9px 26px;
+  font-size: 13px;
+  border-radius: 22px;
+}
+/* icon — paper square (back, overflow, hint, calendar nav) */
+.sw-btn--icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  background: var(--paper);
+  box-shadow: 0 1px 3px rgba(23, 20, 16, 0.06);
+  color: var(--ink);
+  padding: 0;
+}
+.sw-btn--icon:not(:disabled):hover {
+  box-shadow: 0 0 0 1px var(--ink-14), 0 1px 4px rgba(23, 20, 16, 0.07);
+}
+.sw-btn--icon:not(:disabled):active {
+  transform: scale(0.92);
+}
+.sw-btn--icon svg {
+  width: 15px;
+  height: 15px;
+}
+/* text — quiet link (footer, back-to-home, skip) */
+.sw-btn--text {
+  background: none;
+  color: var(--ink-45);
+  font-weight: 500;
+  font-size: 14px;
+  padding: 2px 4px;
+}
+.sw-btn--text:not(:disabled):hover {
+  color: var(--ink-65);
+}
+
+/* ── HomeCard ───────────────────────────────────────────── */
+.sw-card {
+  background: var(--paper);
+  border-radius: 16px;
+  padding: 16px 18px;
+  cursor: pointer;
+  box-shadow: 0 1px 4px rgba(23, 20, 16, 0.06);
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  transition: box-shadow 0.15s, transform 0.1s;
+  width: 100%;
+  text-align: left;
+  border: none;
+  font-family: var(--sans);
+}
+.sw-card:hover {
+  box-shadow: 0 2px 8px rgba(23, 20, 16, 0.1);
+}
+.sw-card:active {
+  transform: scale(0.99);
+}
+.sw-card--lead {
+  padding: 24px 18px;
+}
+.sw-card__icon {
+  width: 69px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+}
+.sw-card__text {
+  flex: 1;
+  min-width: 0;
+}
+.sw-card__text h4 {
+  font-family: var(--serif);
+  font-weight: 600;
+  font-size: 16px;
+  color: var(--ink);
+  margin: 0;
+}
+.sw-card--lead .sw-card__text h4 {
+  font-size: 20px;
+}
+.sw-card__desc {
+  font-size: 11.5px;
+  color: var(--ink-45);
+  margin-top: 1px;
+}
+.sw-card__arrow {
+  color: var(--ink-25);
+  flex-shrink: 0;
+  display: flex;
+}
+.sw-card__arrow svg {
+  width: 15px;
+  height: 15px;
+}
+
+/* mini staircase glyph used as a card icon */
+.sw-hstair {
+  display: flex;
+  flex-direction: column;
+  gap: 2.5px;
+  align-items: flex-start;
+}
+.sw-hstair .r {
+  display: flex;
+  gap: 2.5px;
+}
+.sw-hstair .b {
+  width: 9.375px;
+  height: 9.375px;
+  border-radius: 1.875px;
+  background: var(--accent);
+}
+.sw-hstair .b.g {
+  background: rgba(29, 63, 110, 0.18);
+}
+.sw-hstair--gold .b {
+  background: var(--gold);
+}
+.sw-hstair--gold .b.g {
+  background: rgba(197, 150, 10, 0.24);
+}
+.sw-create-tile {
+  width: 57px;
+  height: 34px;
+  background: rgba(23, 20, 16, 0.05);
+  border-radius: 7px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.sw-create-tile svg {
+  width: 20px;
+  height: 20px;
+  color: var(--ink-45);
+}
+
+/* ── StaircaseBoard ─────────────────────────────────────── */
+.sw-board {
+  padding: 18px 16px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  container-type: inline-size;
+  --num-gutter: 22px;
+  --cgap: 4px;
+  --maxlen: 7;
+}
+.sw-board__row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.sw-board__num {
+  width: 18px;
+  flex-shrink: 0;
+  margin-right: 4px;
+  font-family: var(--sans);
+  font-size: 11px;
+  color: var(--ink-25);
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.sw-board__num--sel {
+  background: var(--accent);
+  color: #fff;
+  border-radius: 5px;
+  text-align: center;
+  padding: 3px 0;
+}
+.sw-cell {
+  width: min(
+    var(--cell),
+    calc(
+      (100cqw - var(--num-gutter) - (var(--maxlen) - 1) * var(--cgap)) /
+        var(--maxlen)
+    )
+  );
+  aspect-ratio: 1;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--serif);
+  font-weight: 600;
+  font-size: 17px;
+  border-radius: 6px;
+  position: relative;
+  color: var(--ink);
+}
+.sw-cell--solved {
+  border: 1px solid var(--ink-25);
+  background: var(--bg);
+}
+.sw-cell--green {
+  background: var(--green);
+  border-color: var(--green);
+}
+.sw-cell--yellow {
+  background: var(--yellow);
+  border-color: var(--yellow);
+}
+.sw-cell--assist {
+  background: var(--assist);
+  border-color: var(--assist);
+}
+.sw-cell--active {
+  border: 1px solid var(--ink-45);
+  background: #fff;
+}
+.sw-cell--cursor {
+  border: 1.5px solid var(--accent);
+  background: #fff;
+}
+.sw-cell--empty {
+  border: 1px solid var(--ink-08);
+  background: var(--paper);
+}
+.sw-cell .sw-stairs {
+  position: absolute;
+  bottom: 2px;
+  right: 2px;
+  width: 10px;
+  height: 10px;
+  color: var(--ink);
+  opacity: 0.5;
+  pointer-events: none;
+}
+.sw-cell--empty .sw-stairs {
+  opacity: 0.3;
+}
+
+/* ── StarRating ─────────────────────────────────────────── */
+.sw-stars {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  color: var(--gold);
+}
+.sw-stars svg {
+  fill: currentColor;
+}
+.sw-stars .sw-star--off {
+  color: var(--ink-14);
+}
+
+/* ── ClueBar ────────────────────────────────────────────── */
+.sw-clue-bar {
+  padding: 12px 18px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.sw-clue-bar__text {
+  flex: 1;
+  text-align: center;
+  font-family: var(--serif);
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--ink);
+}
+.sw-clue-bar__len {
+  color: var(--ink-45);
+  font-size: 14px;
+}
+
+/* ── Keyboard ───────────────────────────────────────────── */
+.sw-keyboard {
+  padding: 4px 14px 20px;
+}
+.sw-kb-row {
+  display: flex;
+  justify-content: center;
+  gap: 5px;
+  margin-top: 6px;
+}
+.sw-key {
+  flex: 1;
+  max-width: 35px;
+  height: 44px;
+  border: none;
+  border-radius: 8px;
+  background: var(--paper);
+  box-shadow: 0 1px 2px rgba(23, 20, 16, 0.08);
+  font-family: var(--sans);
+  font-weight: 400;
+  font-size: 14px;
+  color: var(--ink-25);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: box-shadow 0.12s ease, transform 0.06s ease, background 0.15s ease;
+}
+.sw-key--avail {
+  font-weight: 600;
+  color: var(--ink);
+}
+.sw-key:hover {
+  box-shadow: 0 0 0 1px var(--ink-14), 0 1px 3px rgba(23, 20, 16, 0.07);
+}
+.sw-key:active {
+  transform: translateY(1px);
+}
+.sw-key--wide {
+  max-width: 64px;
+  flex: 1.8;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.sw-key--submit {
+  background: var(--accent);
+  color: #fff;
+  font-weight: 600;
+}
+.sw-key--submit:hover {
+  background: var(--accent-hover);
+}
+
+/* ── TopBar ─────────────────────────────────────────────── */
+.sw-topbar {
+  padding: 14px 18px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+}
+.sw-topbar__title-wrap {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  pointer-events: none;
+}
+.sw-topbar__title {
+  font-family: var(--serif);
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--ink);
+}
+.sw-topbar__date {
+  font-family: var(--sans);
+  font-size: 11px;
+  color: var(--ink-45);
+}
+.sw-topbar__actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ── Modal ──────────────────────────────────────────────── */
+.sw-modal-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(23, 20, 16, 0.45);
+  backdrop-filter: blur(2px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+.sw-modal {
+  background: var(--paper);
+  color: var(--ink);
+  border-radius: 20px;
+  width: 100%;
+  max-width: 340px;
+  padding: 32px 28px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+.sw-modal h3 {
+  font-family: var(--serif);
+  font-size: 22px;
+  font-weight: 600;
+  margin: 0 0 10px;
+}
+.sw-modal p {
+  font-family: var(--sans);
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: var(--ink-65);
+  max-width: 260px;
+  margin: 0;
+}
+
+/* ── Calendar ───────────────────────────────────────────── */
+.sw-cal {
+  padding: 0 14px;
+}
+.sw-cal__weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  margin-bottom: 4px;
+}
+.sw-cal__weekdays span {
+  text-align: center;
+  font-family: var(--sans);
+  font-size: 10.5px;
+  color: var(--ink-45);
+  letter-spacing: 0.04em;
+}
+.sw-cal__grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 5px;
+}
+.sw-day {
+  height: 50px;
+  border-radius: 9px;
+  position: relative;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+}
+.sw-day__num {
+  font-family: var(--sans);
+  font-size: 13px;
+  color: var(--ink-65);
+  font-variant-numeric: tabular-nums;
+}
+.sw-day--completed {
+  background: var(--paper);
+  box-shadow: 0 1px 2px rgba(23, 20, 16, 0.05);
+}
+.sw-day--failed {
+  background: rgba(217, 64, 48, 0.08);
+}
+.sw-day--failed .sw-day__num {
+  color: #b23a2e;
+}
+.sw-day--progress {
+  background: rgba(29, 63, 110, 0.07);
+}
+.sw-day--future {
+  cursor: default;
+}
+.sw-day--future .sw-day__num {
+  color: var(--ink-25);
+}
+.sw-day--today {
+  box-shadow: inset 0 0 0 1.5px var(--accent);
+}
+.sw-day--today.sw-day--completed {
+  box-shadow: inset 0 0 0 1.5px var(--accent), 0 1px 2px rgba(23, 20, 16, 0.05);
+}
+.sw-day__pips {
+  display: flex;
+  gap: 1.5px;
+  height: 9px;
+  align-items: center;
+}
+.sw-day__pips svg {
+  width: 9px;
+  height: 9px;
+  fill: var(--gold);
+}
+.sw-day__dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+.sw-day__x {
+  color: #c2402f;
+  display: flex;
+}
+.sw-day__x svg {
+  width: 9px;
+  height: 9px;
+}
+
+/* segmented toggle (Main / Quick) used above the calendar */
+.sw-seg {
+  display: inline-flex;
+  background: rgba(23, 20, 16, 0.05);
+  border-radius: 11px;
+  padding: 3px;
+}
+.sw-seg__btn {
+  border: none;
+  background: none;
+  font-family: var(--sans);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ink-45);
+  padding: 7px 26px;
+  border-radius: 9px;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, box-shadow 0.15s;
+}
+.sw-seg__btn--active {
+  background: var(--paper);
+  color: var(--ink);
+  box-shadow: 0 1px 2px rgba(23, 20, 16, 0.08);
+}

@@ -10,3 +10,14 @@
 design-explorations/
 HANDOFF.md
 stepwords_current.png
+
+# design-sync staging & build artifacts
+.ds-sync/
+ds-bundle/
+.design-sync/.cache/
+.design-sync/learnings/
+.design-sync/node_modules
+
+# design-system package build artifacts
+design-system/node_modules/
+design-system/dist/
