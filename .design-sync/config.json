@@ -7,6 +7,9 @@
   "cssEntry": "dist/stepwords-ds.css",
   "readmeHeader": ".design-sync/conventions.md",
   "overrides": {
-    "Modal": { "cardMode": "column" }
+    "Modal": { "cardMode": "column" },
+    "HomeCard": { "cardMode": "column" },
+    "TopBar": { "cardMode": "column" },
+    "StaircaseBoard": { "cardMode": "column" }
   }
 }

@@ -1,8 +1,11 @@
 import type { ReactNode } from "react";
 
 export interface ModalProps {
-  /** Heading shown at the top of the card (serif). */
+  /** Heading shown at the top of the card. Rendered as the serif `h3`
+   *  (panel modal) or the `info-wordmark` when `info`. Omit to supply your own
+   *  heading inside `children`. */
   title?: string;
+  /** Modal body — composed freely (panels, illustrations, dots, nav). */
   children?: ReactNode;
   /** Footer actions (e.g. a primary Button), rendered below the body. */
   footer?: ReactNode;
@@ -14,10 +17,10 @@ export interface ModalProps {
 }
 
 /**
- * A centered paper modal over a dimmed, blurred backdrop (prototype
- * `.modal-overlay` > `.modal`) — the shell for the how-to-play and
- * info/credits dialogs. Renders inline (no portal) so it sits within the app
- * frame; place it inside a positioned parent.
+ * The paper modal shell over a dimmed, blurred backdrop (prototype
+ * `.modal-overlay` > `.modal`). It is a layout shell only — compose the body
+ * (how-to panels with illustrations + dots + nav, or the info/credits card)
+ * as `children`. Place it inside a positioned parent.
  */
 export function Modal({
   title,
@@ -38,12 +41,13 @@ export function Modal({
       }}
     >
       <div className={modalClass} role="dialog" aria-modal="true" aria-label={title}>
-        {info && title ? (
-          <span className="info-wordmark">{title}</span>
-        ) : (
-          title && <h3>{title}</h3>
-        )}
-        {children && (info ? <p className="info-credits">{children}</p> : <p>{children}</p>)}
+        {title &&
+          (info ? (
+            <span className="info-wordmark">{title}</span>
+          ) : (
+            <h3>{title}</h3>
+          ))}
+        {children}
         {footer}
       </div>
     </div>

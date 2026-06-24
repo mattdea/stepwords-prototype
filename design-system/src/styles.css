@@ -170,10 +170,12 @@
   display: flex; align-items: center; justify-content: center;
   font-family: var(--serif); font-weight: 600; font-size: 17px; border-radius: 6px; position: relative; color: var(--ink);
 }
-/* inside a board, cells shrink to fit the longest row when it would overflow */
+/* inside a board, cells shrink to fit the longest row when it would overflow.
+   width and height are set to the same length (no aspect-ratio) so the square
+   holds in every renderer. */
 .board .cell {
-  width: min(var(--cell), calc((100cqw - var(--num-gutter) - (var(--maxlen) - 1) * var(--cgap)) / var(--maxlen)));
-  height: auto; aspect-ratio: 1;
+  --cw: min(var(--cell), calc((100cqw - var(--num-gutter) - (var(--maxlen) - 1) * var(--cgap)) / var(--maxlen)));
+  width: var(--cw); height: var(--cw); aspect-ratio: auto;
 }
 .cell.solved { border: 1px solid var(--ink-25); background: var(--bg); }
 .cell.solved.green { background: var(--green); border-color: var(--green); color: var(--ink); }
@@ -287,6 +289,12 @@
 }
 .play-btn:active, .home-play:active, .key.submit:active, .done .share-btn:active, .modal-nav .next:active {
   background: var(--accent-press); transform: translateY(1px) scale(.985);
+}
+.play-btn:disabled, .home-play:disabled {
+  opacity: .4; cursor: not-allowed;
+}
+.play-btn:disabled:hover, .home-play:disabled:hover {
+  background: var(--accent); transform: none;
 }
 .icon-square, .clue-bar .arrow {
   transition: background .15s ease, box-shadow .15s ease, transform .07s ease;
