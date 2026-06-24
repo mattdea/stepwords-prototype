@@ -233,14 +233,9 @@
   padding: 3px 0;
 }
 .sw-cell {
-  width: min(
-    var(--cell),
-    calc(
-      (100cqw - var(--num-gutter) - (var(--maxlen) - 1) * var(--cgap)) /
-        var(--maxlen)
-    )
-  );
-  aspect-ratio: 1;
+  /* a bare cell is a clean fixed square */
+  width: var(--cell);
+  height: var(--cell);
   flex-shrink: 0;
   display: flex;
   align-items: center;
@@ -251,6 +246,18 @@
   border-radius: 6px;
   position: relative;
   color: var(--ink);
+}
+/* inside a board, cells shrink to fit the longest row (container query) */
+.sw-board .sw-cell {
+  width: min(
+    var(--cell),
+    calc(
+      (100cqw - var(--num-gutter) - (var(--maxlen) - 1) * var(--cgap)) /
+        var(--maxlen)
+    )
+  );
+  height: auto;
+  aspect-ratio: 1;
 }
 .sw-cell--solved {
   border: 1px solid var(--ink-25);
