@@ -1,13 +1,18 @@
 import type { ReactNode } from "react";
 import { ArrowRightIcon } from "../icons";
 
-/** Mini staircase glyph used as the Daily/Quick card icon (prototype `.hstair`). */
+/**
+ * Mini staircase glyph used as the Daily/Quick card icon (prototype `.hstair`).
+ * Daily (blue) is 4 rows (3-4-5-6 cells); Quick (gold) is 3 rows (3-4-5). The
+ * lower rows fade to the `.g` tint, exactly as in the prototype.
+ */
 export function StairGlyph({ gold = false }: { gold?: boolean }) {
+  const rowCount = gold ? 3 : 4; // Quick = 3 rows, Daily = 4
   return (
     <div className={gold ? "hstair gold" : "hstair"}>
-      {[3, 4, 5].map((n, ri) => (
+      {Array.from({ length: rowCount }, (_, ri) => (
         <div className="r" key={ri}>
-          {Array.from({ length: n }, (_, i) => (
+          {Array.from({ length: 3 + ri }, (_, i) => (
             <div className={ri >= 2 ? "b g" : "b"} key={i} />
           ))}
         </div>

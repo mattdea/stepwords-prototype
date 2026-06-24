@@ -5,11 +5,17 @@ import {
   Button,
 } from "@stepwords/design-system";
 
+// Home cards run the full phone width in the app; give the preview a matching
+// column so the lead card's title and Play button don't collide.
+const Frame = ({ children }: { children: React.ReactNode }) => (
+  <div style={{ width: 440, maxWidth: "100%" }}>{children}</div>
+);
+
 export const Daily = () => (
-  <div style={{ maxWidth: 360 }}>
+  <Frame>
     <HomeCard
       lead
-      title="Daily Stepword"
+      title="Daily Puzzle"
       description="8 words · Today's main"
       icon={<StairGlyph />}
       action={
@@ -18,25 +24,25 @@ export const Daily = () => (
         </Button>
       }
     />
-  </div>
+  </Frame>
 );
 
 export const Quick = () => (
-  <div style={{ maxWidth: 360 }}>
+  <Frame>
     <HomeCard
-      title="Quick Stepword"
-      description="5 words · A shorter ladder"
+      title="Quick"
+      description="5 words · A shorter challenge"
       icon={<StairGlyph gold />}
     />
-  </div>
+  </Frame>
 );
 
 export const Create = () => (
-  <div style={{ maxWidth: 360 }}>
+  <Frame>
     <HomeCard
-      title="Create a Stepword"
-      description="Build your own ladder"
+      title="Create"
+      description="Submit your own puzzle"
       icon={<CreateGlyph />}
     />
-  </div>
+  </Frame>
 );

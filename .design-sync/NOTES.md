@@ -44,6 +44,9 @@ node .design-sync/scripts/selfcontain-cards.mjs ./ds-bundle
 - On re-sync: build → validate → **run this script** → upload. If you skip it,
   the blank-thumbnail bug returns.
 - Verified 14/14 cards still render with the CDN React in the headless check.
+- The patched cards are large (~35KB each — inlined bundle + CSS). Upload them in
+  small batches (≤7 htmls per `write_files`); a full-bundle single call exceeds the
+  server payload limit and the socket closes.
 
 ## Re-sync risks (what can silently go stale)
 
