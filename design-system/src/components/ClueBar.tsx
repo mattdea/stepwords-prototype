@@ -29,7 +29,12 @@ export function ClueBar({
       </button>
       <span className="clue-text">
         {clue}
-        {length != null && <span className="len"> ({length})</span>}
+        {length != null && (
+          <>
+            {" "}
+            <span className="len">({length})</span>
+          </>
+        )}
       </span>
       <button type="button" className="arrow" aria-label="Next clue" onClick={onNext}>
         <ArrowRightIcon width={14} height={14} />

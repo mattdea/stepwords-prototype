@@ -46,7 +46,8 @@ function DayMark({ day }: { day: CalendarDay }) {
         <XmarkIcon />
       </span>
     );
-  return <span className="pips" />;
+  // not-played / future days carry no indicator child, matching the prototype
+  return null;
 }
 
 /**
@@ -71,7 +72,9 @@ export function Calendar({
         {days.map((d, i) => {
           if (d.day == null) return <div className="day blank" key={i} />;
           const status = d.status ?? "none";
-          const classes = ["day", status, d.today ? "today" : ""]
+          // the prototype's not-played past day uses the class `empty`
+          const statusClass = status === "none" ? "empty" : status;
+          const classes = ["day", statusClass, d.today ? "today" : ""]
             .filter(Boolean)
             .join(" ");
           return (

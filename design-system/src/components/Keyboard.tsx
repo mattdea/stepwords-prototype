@@ -63,7 +63,7 @@ export function Keyboard({
       {ROWS.map((row, ri) => (
         <div className="kb-row" key={ri}>
           {ri === ROWS.length - 1 && showActions && (
-            <Key label="Enter" wide submit onClick={onEnter} />
+            <Key label="Submit" wide submit onClick={onEnter} />
           )}
           {row.split("").map((c) => (
             <Key
@@ -74,7 +74,7 @@ export function Keyboard({
             />
           ))}
           {ri === ROWS.length - 1 && showActions && (
-            <Key label="Del" wide onClick={onDelete} />
+            <Key label="⌫" wide onClick={onDelete} />
           )}
         </div>
       ))}

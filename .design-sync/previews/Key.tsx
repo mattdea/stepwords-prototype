@@ -14,12 +14,12 @@ export const Letters = () => (
 
 export const Submit = () => (
   <Row>
-    <Key label="Enter" wide submit />
+    <Key label="Submit" wide submit />
   </Row>
 );
 
 export const Action = () => (
   <Row>
-    <Key label="Del" wide />
+    <Key label="⌫" wide />
   </Row>
 );
