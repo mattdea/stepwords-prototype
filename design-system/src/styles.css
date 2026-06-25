@@ -172,17 +172,20 @@ body { font-family: var(--sans); color: var(--ink); }
 .row .num { width: 18px; flex-shrink: 0; margin-right: 4px; font-size: 11px; color: var(--ink-25); text-align: right; font-variant-numeric: tabular-nums; font-family: var(--sans); }
 .row .num.sel { background: var(--accent); color: #fff; border-radius: 5px; text-align: center; padding: 3px 0; }
 .cell {
-  /* a bare cell is a fixed square; the board scopes the shrink-to-fit below */
+  /* a bare cell is a fixed square; the board scopes the shrink-to-fit below.
+     font-size scales with the cell so the letter is always proportional. */
   width: var(--cell); height: var(--cell); flex-shrink: 0;
   display: flex; align-items: center; justify-content: center;
-  font-family: var(--serif); font-weight: 600; font-size: 17px; border-radius: 6px; position: relative; color: var(--ink);
+  font-family: var(--serif); font-weight: 600; font-size: calc(var(--cell) * 0.52);
+  border-radius: 6px; position: relative; color: var(--ink);
 }
 /* inside a board, cells shrink to fit the longest row when it would overflow.
-   width and height are set to the same length (no aspect-ratio) so the square
-   holds in every renderer. */
+   width/height/font are all driven by the actual rendered cell size (--cw), so
+   the letter stays proportional even when the container query shrinks the cell. */
 .board .cell {
   --cw: min(var(--cell), calc((100cqw - var(--num-gutter) - (var(--maxlen) - 1) * var(--cgap)) / var(--maxlen)));
   width: var(--cw); height: var(--cw); aspect-ratio: auto;
+  font-size: calc(var(--cw) * 0.52);
 }
 .cell.solved { border: 1px solid var(--ink-25); background: var(--bg); }
 .cell.solved.green { background: var(--green); border-color: var(--green); color: var(--ink); }
@@ -394,7 +397,7 @@ body { font-family: var(--sans); color: var(--ink); }
 /* ══════════════ WIDER SCREENS (centered column, scaled up) ══════════════ */
 @media (min-width: 600px) {
   .phone { --cell: 46px; }
-  .cell { font-size: 24px; border-radius: 8px; }
+  .cell { border-radius: 8px; }   /* font-size is proportional to --cell/--cw above */
   .row { gap: 6px; }
   .row .num { width: 26px; margin-right: 6px; font-size: 13px; }
   .row .num.sel { border-radius: 6px; padding: 4px 0; }
