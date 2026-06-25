@@ -24,7 +24,9 @@
   }
   .fa { font-family: "FA"; font-weight: 900; font-style: normal; line-height: 1; display: inline-block; -webkit-font-smoothing: antialiased; }
 
-  body { background: var(--bg); color: var(--ink); overflow: hidden; }
+  body { background: var(--bg); color: var(--ink); overflow: hidden; -webkit-tap-highlight-color: transparent; }
+  /* taps shouldn't trigger Safari's double-tap-to-zoom on interactive elements */
+  .key, .x-btn, .play-btn, .btn-primary, .btn-ghost, .cell { touch-action: manipulation; }
   .stage { position: relative; width: 100%; height: 100dvh; overflow: hidden; }
 
   .screen {
@@ -83,7 +85,7 @@
 
   /* ══════════════ GAME ══════════════ */
   #screen-game { justify-content: flex-start; }
-  .g-top { width: 100%; display: flex; justify-content: flex-start; padding: 16px 18px 0; }
+  .g-top { width: 100%; display: flex; justify-content: flex-start; padding: 16px 16px 0; }
   .x-btn {
     width: 38px; height: 38px; border: none; background: transparent; cursor: pointer;
     color: var(--ink-25); display: flex; align-items: center; justify-content: center; border-radius: 12px;
@@ -96,7 +98,7 @@
   /* clue sits just above the keyboard, with a gentle divider above (edges fade to 0) */
   .clue-bar { position: relative; width: 100%; display: flex; align-items: center; justify-content: center; padding: 15px 18px 20px; }
   .clue-bar::before {
-    content: ""; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+    content: ""; position: absolute; top: 0; left: 16px; right: 16px; height: 1px;
     background: linear-gradient(to right, transparent 0%, var(--ink-14) 22%, var(--ink-14) 78%, transparent 100%);
   }
   .clue-bar .clue-text { text-align: center; font-family: var(--serif); font-size: 18px; font-weight: 500; color: var(--ink); }
@@ -143,7 +145,7 @@
     transition: box-shadow .12s ease, transform .06s ease, background .12s;
   }
   .key.avail { color: var(--ink); font-weight: 600; }
-  .key:hover { box-shadow: 0 0 0 1px var(--ink-14), 0 1px 3px rgba(23,20,16,.07); }
+  @media (hover: hover) { .key:hover { box-shadow: 0 0 0 1px var(--ink-14), 0 1px 3px rgba(23,20,16,.07); } }
   .key:active { transform: translateY(1px); }
   .key.wide { flex: 1.65; max-width: 66px; padding: 0 4px; font-size: 11px; letter-spacing: .03em; text-transform: uppercase; font-weight: 600; }
   .key.submit { background: var(--accent); color: #fff; }
