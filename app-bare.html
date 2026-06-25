@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Stepwords — Bare</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="stepwords-tokens.css">
+<style>
+  /* ════════════════════════════════════════════════════════════
+     BARE — minimalist-zen × playful-juicy. Clue + board + keyboard,
+     no timer / stars / menus. Playful home + completion.
+     ════════════════════════════════════════════════════════════ */
+
+  /* ── Font Awesome: prefer the locally-installed font, fall back to CDN webfont ── */
+  @font-face {
+    font-family: "FA"; font-style: normal; font-weight: 900; font-display: swap;
+    src: local("Font Awesome 7 Free Solid"), local("Font Awesome 7 Pro Solid"),
+         local("Font Awesome 6 Free Solid"), local("Font Awesome 6 Pro Solid"),
+         local("FontAwesome6Free-Solid"), local("FontAwesome6Pro-Solid"),
+         local("Font Awesome 5 Free Solid"), local("FontAwesome5Free-Solid"),
+         url("https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/webfonts/fa-solid-900.woff2") format("woff2");
+  }
+  .fa { font-family: "FA"; font-weight: 900; font-style: normal; line-height: 1; display: inline-block; -webkit-font-smoothing: antialiased; }
+
+  body { background: var(--bg); color: var(--ink); overflow: hidden; }
+  .stage { position: relative; width: 100%; height: 100dvh; overflow: hidden; }
+
+  .screen {
+    position: absolute; inset: 0; display: flex; flex-direction: column;
+    align-items: center; opacity: 0; transform: translateY(12px);
+    pointer-events: none; transition: opacity .4s ease, transform .4s ease;
+  }
+  .screen.active { opacity: 1; transform: none; pointer-events: auto; }
+
+  /* ══════════════ HOME (Shuffalo-style) ══════════════ */
+  #screen-home { justify-content: center; text-align: center; padding: 40px 28px; }
+  .home-inner { display: flex; flex-direction: column; align-items: center; max-width: 400px; }
+  .wordmark {
+    font-family: "bitcount-grid-single-square", sans-serif; font-weight: 500; font-style: normal;
+    font-size: 42px; line-height: 1; color: var(--ink); margin-bottom: 16px;
+  }
+  .home-blurb { font-size: 15px; line-height: 1.55; color: var(--ink-45); max-width: 300px; margin-bottom: 30px; }
+
+  /* the illustration: a mini game board (left-aligned rows growing down-right).
+     A color wave flows through ALL cells on a loop + a gentle pulse; the whole
+     mark rises and settles in on load. */
+  .illo { margin-bottom: 26px; }
+  .illo svg { display: block; overflow: visible; animation: introRise .75s cubic-bezier(.34,1.5,.5,1) both; }
+  @keyframes introRise {
+    0%   { opacity: 0; transform: translateY(-16px) scale(.7); }
+    60%  { opacity: 1; transform: translateY(0) scale(1.06); }
+    100% { opacity: 1; transform: translateY(0) scale(1); }
+  }
+  .illo .ic {
+    transform-box: fill-box; transform-origin: center;
+    animation: tilePulse 2.6s ease-in-out infinite, tileFlow 4.8s linear infinite;
+  }
+  @keyframes tilePulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.09); } }
+  @keyframes tileFlow {
+    0%   { fill: var(--accent); }
+    25%  { fill: var(--accent-hover); }
+    50%  { fill: var(--gold); }
+    75%  { fill: var(--green); }
+    100% { fill: var(--accent); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .illo .ic { animation: none; fill: var(--accent); }
+    .illo svg { animation: none; }
+  }
+
+  .play-btn {
+    background: var(--accent); color: #fff; border: none; font-family: var(--sans);
+    font-weight: 600; font-size: 16px; padding: 15px 56px; border-radius: 32px; cursor: pointer;
+    letter-spacing: .02em; box-shadow: 0 6px 20px rgba(29,63,110,.28);
+    transition: transform .12s ease, box-shadow .2s ease, background .15s; margin-bottom: 26px;
+  }
+  .play-btn:hover { background: var(--accent-hover); box-shadow: 0 8px 26px rgba(29,63,110,.34); }
+  .play-btn:active { transform: scale(.96); }
+  .home-date { font-size: 14px; color: var(--ink); letter-spacing: .01em; margin-bottom: 6px; }
+  .home-credit { font-size: 12.5px; color: var(--ink-65); letter-spacing: .02em; }
+
+  /* ══════════════ GAME ══════════════ */
+  #screen-game { justify-content: flex-start; }
+  .g-top { width: 100%; display: flex; justify-content: flex-start; padding: 16px 18px 0; }
+  .x-btn {
+    width: 38px; height: 38px; border: none; background: transparent; cursor: pointer;
+    color: var(--ink-25); display: flex; align-items: center; justify-content: center; border-radius: 12px;
+    transition: color .15s, background .15s;
+  }
+  .x-btn:hover { color: var(--ink-65); background: var(--ink-08); }
+  .x-btn .fa { font-size: 16px; }
+
+  /* clue sits just above the board (grouped with it, centered as a unit) */
+  /* clue sits just above the keyboard, with a gentle divider above (edges fade to 0) */
+  .clue-bar { position: relative; width: 100%; display: flex; align-items: center; justify-content: center; padding: 15px 18px 20px; }
+  .clue-bar::before {
+    content: ""; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+    background: linear-gradient(to right, transparent 0%, var(--ink-14) 22%, var(--ink-14) 78%, transparent 100%);
+  }
+  .clue-bar .clue-text { text-align: center; font-family: var(--serif); font-size: 18px; font-weight: 500; color: var(--ink); }
+  .clue-bar .len { color: var(--ink-45); font-size: 15px; }
+
+  .board-wrap { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 26px; width: 100%; padding: 8px 16px; }
+  /* --cell / --gap are sized to fit by JS (fitBoard) so the grid scales to the full width */
+  #board { width: 100%; max-width: 560px; --cell: 40px; --gap: 6px; display: flex; flex-direction: column; gap: var(--gap); }
+  .row { display: flex; gap: var(--gap); }
+  .cell {
+    width: var(--cell); height: var(--cell); border-radius: clamp(6px, calc(var(--cell) * .26), 12px); background: var(--paper);
+    box-shadow: inset 0 0 0 1.5px var(--ink-08);
+    display: flex; align-items: center; justify-content: center; position: relative;
+    font-family: var(--sans); font-weight: 600; font-size: calc(var(--cell) * .44);
+    color: var(--ink); transition: box-shadow .18s ease, background .25s ease, transform .18s ease;
+  }
+  .cell.empty { box-shadow: inset 0 0 0 1.5px var(--ink-08); background: var(--paper); }
+  .cell.active { box-shadow: inset 0 0 0 1.5px var(--ink-25); background: #fff; cursor: pointer; }
+  .cell.active.pending { box-shadow: inset 0 0 0 1.5px var(--ink-14); background: var(--paper); }
+  .cell.active.cursor { box-shadow: inset 0 0 0 2px var(--accent); background: #fff; }
+  /* solved cells keep BLACK letters, even on green/yellow/assist */
+  .cell.solved { box-shadow: none; color: var(--ink); }
+  .cell.solved.green  { background: var(--green); }
+  .cell.solved.yellow { background: var(--yellow); }
+  .cell.solved.assist { background: var(--assist); }
+  /* step glyph, bottom-right of the new-letter cell */
+  .cell .stairs { position: absolute; bottom: 3px; right: 3px; width: 12px; height: 11px; color: var(--ink); opacity: .42; pointer-events: none; }
+
+  /* juicy solve bounce */
+  .cell.pop { animation: pop .42s cubic-bezier(.34,1.56,.64,1) both; animation-delay: calc(var(--col) * .05s); }
+  @keyframes pop { 0% { transform: scale(.6); } 60% { transform: scale(1.18); } 100% { transform: scale(1); } }
+
+  .board.shake { animation: shake .4s ease; }
+  @keyframes shake { 0%,100% { transform: translateX(0); } 20%,60% { transform: translateX(-7px); } 40%,80% { transform: translateX(7px); } }
+
+  /* ── full keyboard (same model as the other versions) ── */
+  .keyboard { width: 100%; max-width: 560px; padding: 0 14px 18px; }
+  .kb-row { display: flex; justify-content: center; gap: 5px; margin-top: 6px; }
+  .kb-row:first-child { margin-top: 0; }   /* keep space below the clue == space above it */
+  .key {
+    flex: 1; max-width: 32px; height: 46px; border: none; border-radius: 9px; background: var(--paper);
+    box-shadow: 0 1px 2px rgba(23,20,16,.08); font-family: var(--sans); font-weight: 500; font-size: 15px;
+    color: var(--ink-25); cursor: pointer; display: flex; align-items: center; justify-content: center;
+    transition: box-shadow .12s ease, transform .06s ease, background .12s;
+  }
+  .key.avail { color: var(--ink); font-weight: 600; }
+  .key:hover { box-shadow: 0 0 0 1px var(--ink-14), 0 1px 3px rgba(23,20,16,.07); }
+  .key:active { transform: translateY(1px); }
+  .key.wide { flex: 1.65; max-width: 66px; padding: 0 4px; font-size: 11px; letter-spacing: .03em; text-transform: uppercase; font-weight: 600; }
+  .key.submit { background: var(--accent); color: #fff; }
+  .key.submit:hover { background: var(--accent-hover); }
+  .key.back .fa { font-size: 17px; color: var(--ink-45); }
+
+  /* ══════════════ DONE ══════════════ */
+  #screen-done { justify-content: center; text-align: center; padding: 32px; }
+  .done-inner { display: flex; flex-direction: column; align-items: center; width: 100%; max-width: 360px; container-type: inline-size; }
+  /* completion staircase — mirrors the gameplay board, scales to fit width */
+  .done-stair { display: flex; flex-direction: column; gap: 6px; align-items: flex-start; width: 100%; margin: 0 0 28px; --ds: min(32px, calc((100cqw - 54px) / 10)); }
+  .ds-row { display: flex; gap: 6px; }
+  .ds-cell {
+    width: var(--ds); aspect-ratio: 1; border-radius: clamp(5px, calc(var(--ds) * .25), 8px); background: var(--green); color: var(--ink);
+    display: flex; align-items: center; justify-content: center; position: relative;
+    font-family: var(--sans); font-weight: 600; font-size: calc(var(--ds) * .5); opacity: 0;
+    box-shadow: 0 2px 6px rgba(109,198,143,.35);
+  }
+  .ds-cell.reveal { animation: dsPop .55s cubic-bezier(.34,1.56,.64,1) both; animation-delay: var(--d, 0s); }
+  @keyframes dsPop {
+    0%   { opacity: 0; transform: scale(.2) translateY(14px) rotate(-7deg); }
+    55%  { opacity: 1; transform: scale(1.16) translateY(-3px) rotate(0deg); }
+    100% { opacity: 1; transform: scale(1) translateY(0); }
+  }
+  .ds-cell .stairs { position: absolute; bottom: 3px; right: 3px; width: 10px; height: 9px; color: var(--ink); opacity: 0; }
+  .ds-cell.reveal .stairs { animation: dotFade .4s ease both; animation-delay: calc(var(--d, 0s) + .34s); }
+  @keyframes dotFade { to { opacity: .42; } }
+
+  .done-title { font-family: var(--serif); font-size: 38px; font-weight: 600; margin-bottom: 8px; }
+  .done-sub { font-size: 14px; color: var(--ink-45); margin-bottom: 28px; }
+  .done-title, .done-sub, .done-actions { opacity: 0; }
+  #screen-done.active .done-title   { animation: fadeUp .55s ease both; animation-delay: 1.05s; }
+  #screen-done.active .done-sub     { animation: fadeUp .55s ease both; animation-delay: 1.18s; }
+  #screen-done.active .done-actions { animation: fadeUp .55s ease both; animation-delay: 1.34s; }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+  .done-actions { display: flex; gap: 12px; }
+  .btn-primary {
+    background: var(--accent); color: #fff; border: none; font-family: var(--sans); font-weight: 600;
+    font-size: 15px; padding: 13px 32px; border-radius: 28px; cursor: pointer; transition: transform .12s, background .15s;
+  }
+  .btn-primary:hover { background: var(--accent-hover); }
+  .btn-primary:active { transform: scale(.96); }
+  .btn-ghost {
+    background: var(--paper); color: var(--ink); border: none; font-family: var(--sans); font-weight: 600;
+    font-size: 15px; padding: 13px 28px; border-radius: 28px; cursor: pointer; box-shadow: inset 0 0 0 1px var(--ink-08);
+    transition: transform .12s, box-shadow .15s;
+  }
+  .btn-ghost:hover { box-shadow: inset 0 0 0 1px var(--ink-14); }
+  .btn-ghost:active { transform: scale(.96); }
+
+  /* confetti */
+  .confetti { position: fixed; inset: 0; pointer-events: none; overflow: hidden; z-index: 50; }
+  .conf { position: absolute; width: 9px; height: 14px; border-radius: 2px; will-change: transform, opacity; }
+
+  /* toast */
+  .toast {
+    position: fixed; bottom: 34px; left: 50%; transform: translateX(-50%) translateY(20px);
+    background: var(--ink); color: var(--paper); font-size: 13.5px; font-weight: 500;
+    padding: 11px 20px; border-radius: 22px; opacity: 0; pointer-events: none; transition: opacity .25s, transform .25s; z-index: 60;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  /* larger cells / type on bigger screens */
+  @media (min-width: 600px) {
+    .wordmark { font-size: 52px; }
+    .clue-bar .clue-text { font-size: 21px; }
+    .key { max-width: 44px; height: 54px; font-size: 17px; border-radius: 11px; }
+    .key.wide { max-width: 82px; font-size: 12px; }
+  }
+</style>
+</head>
+<body>
+<div class="stage">
+
+  <!-- ══════════════ HOME ══════════════ -->
+  <section class="screen" id="screen-home">
+    <div class="home-inner">
+      <div class="illo">
+        <svg width="122" height="122" viewBox="0 0 122 122" xmlns="http://www.w3.org/2000/svg">
+          <!-- row 1 (k=0) -->
+          <rect class="ic" x="0"  y="0"  width="26" height="26" rx="6" style="animation-delay:0s,0s"/>
+          <!-- row 2 (k=1,2) -->
+          <rect class="ic" x="0"  y="32" width="26" height="26" rx="6" style="animation-delay:-.2s,-.6s"/>
+          <rect class="ic" x="32" y="32" width="26" height="26" rx="6" style="animation-delay:-.4s,-1.2s"/>
+          <!-- row 3 (k=2,3,4) -->
+          <rect class="ic" x="0"  y="64" width="26" height="26" rx="6" style="animation-delay:-.4s,-1.2s"/>
+          <rect class="ic" x="32" y="64" width="26" height="26" rx="6" style="animation-delay:-.6s,-1.8s"/>
+          <rect class="ic" x="64" y="64" width="26" height="26" rx="6" style="animation-delay:-.8s,-2.4s"/>
+          <!-- row 4 (k=3,4,5,6) -->
+          <rect class="ic" x="0"  y="96" width="26" height="26" rx="6" style="animation-delay:-.6s,-1.8s"/>
+          <rect class="ic" x="32" y="96" width="26" height="26" rx="6" style="animation-delay:-.8s,-2.4s"/>
+          <rect class="ic" x="64" y="96" width="26" height="26" rx="6" style="animation-delay:-1s,-3s"/>
+          <rect class="ic" x="96" y="96" width="26" height="26" rx="6" style="animation-delay:-1.2s,-3.6s"/>
+        </svg>
+      </div>
+      <h1 class="wordmark">Stepwords</h1>
+      <p class="home-blurb">Eight words, each one letter longer. Climb your way to the top.</p>
+      <button class="play-btn" id="play-btn">Play</button>
+      <div class="home-date" id="home-date">—</div>
+      <div class="home-credit">Created by Ben Reich</div>
+    </div>
+  </section>
+
+  <!-- ══════════════ GAME ══════════════ -->
+  <section class="screen" id="screen-game">
+    <div class="g-top">
+      <button class="x-btn" id="game-back" aria-label="Back"><i class="fa">&#xf00d;</i></button>
+    </div>
+
+    <div class="board-wrap">
+      <div class="board" id="board"></div>
+    </div>
+
+    <div class="clue-bar">
+      <span class="clue-text" id="clue-text"></span>
+    </div>
+
+    <div class="keyboard" id="keyboard"></div>
+  </section>
+
+  <!-- ══════════════ DONE ══════════════ -->
+  <section class="screen" id="screen-done">
+    <div class="done-inner">
+      <div class="done-stair" id="done-stair"></div>
+      <h1 class="done-title" id="done-title">Nice!</h1>
+      <p class="done-sub" id="done-sub">—</p>
+      <div class="done-actions">
+        <button class="btn-ghost" id="share-btn">Share</button>
+        <button class="btn-primary" id="replay-btn">Play again</button>
+      </div>
+    </div>
+  </section>
+
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+(function () {
+  "use strict";
+
+  // ── full ladder (8 rows, 3→10 letters) ──
+  var PUZZLE = {
+    rows: [
+      { word: "EAT",        clue: "Have a meal",         start: true },
+      { word: "RATE",       clue: "Speed or charge",     newLetter: "R" },
+      { word: "TEARS",      clue: "Drops from crying",   newLetter: "S" },
+      { word: "STARED",     clue: "Looked fixedly",      newLetter: "D" },
+      { word: "ASTRIDE",    clue: "Legs on either side", newLetter: "I" },
+      { word: "STRAINED",   clue: "Tense, as relations", newLetter: "N" },
+      { word: "GRADIENTS",  clue: "Slopes or inclines",  newLetter: "G" },
+      { word: "DENIGRATES", clue: "Belittles unfairly",  newLetter: "E" }
+    ]
+  };
+  var N = PUZZLE.rows.length;
+  var $ = function (id) { return document.getElementById(id); };
+
+  var dateFull = new Date().toLocaleDateString("en-US", { weekday: "long", year: "numeric", month: "long", day: "numeric" });
+  $("home-date").textContent = dateFull;
+
+  var STAIRS_SVG = '<svg class="stairs" viewBox="0 0 576 512" fill="currentColor"><path d="M326.8 101.6C326.8 80.2494 344.049 63 365.4 63H519.8C541.151 63 558.4 80.2494 558.4 101.6C558.4 122.951 541.151 140.2 519.8 140.2H404V256C404 277.351 386.751 294.6 365.4 294.6H249.6V410.4C249.6 431.751 232.351 449 211 449H56.6C31.8719 449 18 434.5 18 410.4C18 389.049 35.2494 371.8 56.6 371.8H172.4V256C172.4 234.649 189.649 217.4 211 217.4H326.8V101.6Z"/></svg>';
+
+  // ── state ──
+  var active, cursor, work, solved, colors, justSolvedRow;
+
+  function show(name) {
+    var s = document.querySelectorAll(".screen");
+    for (var i = 0; i < s.length; i++) s[i].classList.remove("active");
+    $("screen-" + name).classList.add("active");
+  }
+
+  function addedIndex(row) { return row.newLetter ? row.word.indexOf(row.newLetter) : -1; }
+  function makeWork(i) {
+    var len = PUZZLE.rows[i].word.length, s = [];
+    for (var c = 0; c < len; c++) s.push({ ch: "", locked: false, color: null });
+    return { slots: s, attempts: 0 };
+  }
+  function curSlots() { return work[active] ? work[active].slots : []; }
+  function firstUnlocked(from) {
+    var s = curSlots();
+    for (var c = from; c < s.length; c++) if (!s[c].locked) return c;
+    return -1;
+  }
+  function advanceCursor() {
+    var s = curSlots();
+    for (var c = cursor + 1; c < s.length; c++) { if (!s[c].locked) { cursor = c; return; } }
+  }
+
+  // ── board ──
+  function renderBoard() {
+    var board = $("board");
+    board.innerHTML = "";
+    PUZZLE.rows.forEach(function (row, i) {
+      var rowEl = document.createElement("div");
+      rowEl.className = "row";
+      var len = row.word.length, addIdx = addedIndex(row);
+      for (var c = 0; c < len; c++) {
+        var cell = document.createElement("div");
+        cell.className = "cell";
+        var letter = "";
+        if (solved[i]) {
+          cell.classList.add("solved", colors[i][c]);
+          letter = row.word[c];
+          if (i === justSolvedRow) { cell.classList.add("pop"); cell.style.setProperty("--col", c); }
+        } else {
+          var slot = work[i].slots[c];
+          cell.dataset.row = i; cell.dataset.col = c;
+          if (slot.locked) { cell.classList.add("solved", slot.color); letter = slot.ch; }
+          else if (slot.ch) { cell.classList.add("active"); letter = slot.ch; if (i === active && c === cursor) cell.classList.add("cursor"); }
+          else if (i === active && c === cursor) cell.classList.add("active", "cursor");
+          else if (i === active) cell.classList.add("active", "pending");
+          else cell.classList.add("empty");
+        }
+        cell.textContent = letter;
+        if (c === addIdx && row.newLetter) cell.insertAdjacentHTML("beforeend", STAIRS_SVG);
+        rowEl.appendChild(cell);
+      }
+      board.appendChild(rowEl);
+    });
+    justSolvedRow = -1;
+  }
+
+  // ── keyboard ──
+  var KB = ["QWERTYUIOP", "ASDFGHJKL", "ZXCVBNM"];
+  function renderKeyboard() {
+    var kb = $("keyboard");
+    kb.innerHTML = "";
+    var avail = {};
+    PUZZLE.rows[active].word.split("").forEach(function (ch) { avail[ch] = true; });
+    KB.forEach(function (line, ri) {
+      var rowEl = document.createElement("div");
+      rowEl.className = "kb-row";
+      if (ri === 2) rowEl.appendChild(makeKey("Submit", "submit"));
+      line.split("").forEach(function (ch) {
+        var k = makeKey(ch, avail[ch] ? "avail" : "");
+        k.dataset.letter = ch;
+        rowEl.appendChild(k);
+      });
+      if (ri === 2) rowEl.appendChild(makeKey("back", "back"));
+      kb.appendChild(rowEl);
+    });
+  }
+  function makeKey(label, mod) {
+    var b = document.createElement("button");
+    b.className = "key" + (mod === "avail" ? " avail" : mod === "submit" ? " wide submit" : mod === "back" ? " wide back" : "");
+    if (mod === "back") { b.innerHTML = '<i class="fa">&#xf55a;</i>'; b.setAttribute("aria-label", "Backspace"); }
+    else b.textContent = label;
+    if (mod === "submit") b.dataset.action = "submit";
+    else if (mod === "back") b.dataset.action = "back";
+    return b;
+  }
+
+  // ── clue (follows the selected row) ──
+  function renderClue() {
+    var row = PUZZLE.rows[active];
+    $("clue-text").innerHTML = row.clue + ' <span class="len">(' + row.word.length + ')</span>';
+  }
+
+  // ── lifecycle ──  (NOTE: nothing is pre-filled — the whole board starts blank)
+  function start() {
+    solved = []; colors = []; work = [];
+    for (var i = 0; i < N; i++) { solved.push(false); colors.push(null); work.push(makeWork(i)); }
+    active = 0; cursor = 0; justSolvedRow = -1;
+    renderBoard(); renderKeyboard(); renderClue();
+    show("game");
+    requestAnimationFrame(fitBoard);
+  }
+
+  // size cells + gaps so the widest row fills the board width (scales with the viewport)
+  var MAX_LEN = PUZZLE.rows.reduce(function (m, r) { return Math.max(m, r.word.length); }, 0);
+  function fitBoard() {
+    var board = $("board");
+    var avail = board.clientWidth;
+    if (!avail) return;
+    var ratio = 0.16;                                  // gap as a fraction of a cell
+    var cell = Math.min(54, avail / (MAX_LEN + ratio * (MAX_LEN - 1)));
+    board.style.setProperty("--cell", cell.toFixed(2) + "px");
+    board.style.setProperty("--gap", (cell * ratio).toFixed(2) + "px");
+  }
+  window.addEventListener("resize", fitBoard);
+
+  function selectRow(i, col) {
+    active = i;
+    if (!solved[i]) {
+      var s = work[i].slots;
+      if (typeof col === "number" && !s[col].locked) cursor = col;
+      else { var f = firstUnlocked(0); cursor = f < 0 ? 0 : f; }
+    }
+    renderClue(); renderKeyboard(); renderBoard();
+  }
+
+  function type(ch) {
+    if (solved[active] || !work[active]) return;
+    var s = work[active].slots;
+    if (!s[cursor] || s[cursor].locked) { var f = firstUnlocked(0); if (f < 0) return; cursor = f; }
+    s[cursor].ch = ch;
+    advanceCursor();
+    renderBoard();
+  }
+  function backspace() {
+    if (solved[active] || !work[active]) return;
+    var s = work[active].slots;
+    if (s[cursor] && !s[cursor].locked && s[cursor].ch) { s[cursor].ch = ""; renderBoard(); return; }
+    for (var c = cursor - 1; c >= 0; c--) { if (!s[c].locked) { cursor = c; s[c].ch = ""; renderBoard(); return; } }
+  }
+  function shakeAnim() {
+    var b = $("board");
+    b.classList.add("shake");
+    setTimeout(function () { b.classList.remove("shake"); }, 400);
+  }
+
+  function submit() {
+    if (solved[active] || !work[active]) return;
+    var s = work[active].slots;
+    if (!s.every(function (x) { return x.locked || x.ch; })) { shakeAnim(); return; }
+    work[active].attempts++;
+    var att = work[active].attempts, sol = PUZZLE.rows[active].word, anyWrong = false;
+    for (var c = 0; c < s.length; c++) {
+      if (s[c].locked) continue;
+      if (s[c].ch === sol[c]) { s[c].locked = true; s[c].color = (att === 1 ? "green" : "yellow"); }
+      else { s[c].ch = ""; anyWrong = true; }
+    }
+    if (s.every(function (x) { return x.locked; })) { finishRow(); }
+    else { var f = firstUnlocked(0); if (f >= 0) cursor = f; renderBoard(); if (anyWrong) shakeAnim(); }
+  }
+  function nextUnsolved(from) {
+    for (var i = from; i < N; i++) if (!solved[i]) return i;
+    for (var j = 0; j < from; j++) if (!solved[j]) return j;
+    return -1;
+  }
+  function finishRow() {
+    var i = active;
+    solved[i] = true;
+    colors[i] = work[i].slots.map(function (x) { return x.color; });
+    work[i] = null;
+    justSolvedRow = i;
+    var nxt = nextUnsolved(i + 1);
+    if (nxt < 0) { renderBoard(); setTimeout(finish, 760); return; }
+    active = nxt;
+    var f = firstUnlocked(0);
+    cursor = f < 0 ? 0 : f;
+    renderBoard(); renderKeyboard(); renderClue();
+  }
+
+  // ── completion ──
+  function finish() {
+    var stair = $("done-stair");
+    stair.innerHTML = "";
+    PUZZLE.rows.forEach(function (row, i) {
+      var r = document.createElement("div");
+      r.className = "ds-row";
+      var np = addedIndex(row);
+      for (var c = 0; c < row.word.length; c++) {
+        var cell = document.createElement("div");
+        cell.className = "ds-cell reveal";
+        cell.style.setProperty("--d", (0.15 + i * 0.1 + c * 0.045).toFixed(3) + "s");
+        cell.textContent = row.word[c];
+        if (c === np && row.newLetter) cell.insertAdjacentHTML("beforeend", STAIRS_SVG);
+        r.appendChild(cell);
+      }
+      stair.appendChild(r);
+    });
+    $("done-sub").textContent = dateFull;
+    show("done");
+    setTimeout(confetti, 1050);
+  }
+
+  function confetti() {
+    var colorList = ["#1d3f6e", "#e2c044", "#6dc68f", "#244e87"];
+    var layer = document.createElement("div");
+    layer.className = "confetti";
+    document.body.appendChild(layer);
+    var W = window.innerWidth;
+    for (var i = 0; i < 70; i++) {
+      var p = document.createElement("div");
+      p.className = "conf";
+      p.style.background = colorList[i % colorList.length];
+      p.style.left = (Math.random() * W) + "px";
+      p.style.top = "-20px";
+      layer.appendChild(p);
+      animateConf(p);
+    }
+    setTimeout(function () { layer.remove(); }, 2600);
+  }
+  function animateConf(p) {
+    var dx = (Math.random() - 0.5) * 220, dy = window.innerHeight + 60, rot = (Math.random() - 0.5) * 720, dur = 1600 + Math.random() * 900;
+    p.animate(
+      [ { transform: "translate(0,0) rotate(0deg)", opacity: 1 },
+        { transform: "translate(" + dx + "px," + dy + "px) rotate(" + rot + "deg)", opacity: 0.9 } ],
+      { duration: dur, easing: "cubic-bezier(.2,.6,.4,1)", fill: "forwards" }
+    );
+  }
+
+  function toast(msg) {
+    var t = $("toast");
+    t.textContent = msg; t.classList.add("show");
+    setTimeout(function () { t.classList.remove("show"); }, 1800);
+  }
+
+  // ── wiring ──
+  $("play-btn").addEventListener("click", start);
+  $("replay-btn").addEventListener("click", start);
+  $("game-back").addEventListener("click", function () { show("home"); });
+
+  $("keyboard").addEventListener("click", function (e) {
+    var k = e.target.closest(".key");
+    if (!k) return;
+    if (k.dataset.action === "submit") submit();
+    else if (k.dataset.action === "back") backspace();
+    else if (k.dataset.letter) type(k.dataset.letter);
+  });
+
+  $("board").addEventListener("click", function (e) {
+    var cell = e.target.closest(".cell");
+    if (!cell || cell.dataset.row === undefined) return;
+    selectRow(parseInt(cell.dataset.row, 10), parseInt(cell.dataset.col, 10));
+  });
+
+  document.addEventListener("keydown", function (e) {
+    if (!$("screen-game").classList.contains("active")) return;
+    if (e.key === "Enter") { submit(); e.preventDefault(); }
+    else if (e.key === "Backspace") { backspace(); e.preventDefault(); }
+    else if (/^[a-zA-Z]$/.test(e.key)) { type(e.key.toUpperCase()); }
+  });
+
+  $("share-btn").addEventListener("click", function () {
+    var lines = ["Stepwords — Today's Climb", dateFull, ""];
+    PUZZLE.rows.forEach(function (row, i) {
+      var s = "";
+      for (var c = 0; c < row.word.length; c++) { s += (colors[i] && colors[i][c] === "yellow") ? "🟨" : "🟩"; }
+      lines.push(s);
+    });
+    var txt = lines.join("\n");
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(txt).then(function () { toast("Copied to clipboard!"); }, function () { toast("Copy failed"); });
+    } else { toast("Copied to clipboard!"); }
+  });
+
+  show("home");
+})();
+</script>
+</body>
+</html>

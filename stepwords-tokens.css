@@ -1,0 +1,45 @@
+/* ════════════════════════════════════════════════════════════════
+   Stepwords — shared design tokens
+   The one visual language all three versions (Ben / Current / Bare)
+   share. Change a token here and it propagates everywhere.
+   Fonts: Kazimir Text (serif, Adobe Typekit) + Libre Franklin (sans).
+   ════════════════════════════════════════════════════════════════ */
+
+@import url("https://use.typekit.net/cst1gej.css?v=2");
+@import url("https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@300;400;500;600&display=swap");
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --paper: #fdfcf8;
+  --bg: #f4f2ea;
+  --ink: #171410;
+  --ink-65: rgba(23,20,16,.65);
+  --ink-45: #6c6c6c;   /* muted text — solid for AA contrast */
+  --ink-25: rgba(23,20,16,.25);
+  --ink-14: rgba(23,20,16,.14);
+  --ink-08: rgba(23,20,16,.08);
+  --accent: #1d3f6e;
+  --accent-hover: #244e87;
+  --accent-press: #16314f;
+  --accent-light: rgba(29,63,110,.12);
+  --gold: #e2c044;
+  --gold-light: rgba(197,150,10,.1);
+  --green: #6dc68f;   /* solved first try */
+  --yellow: #e3b13e;  /* solved on a later try */
+  --assist: #b7c0cb;  /* revealed by a hint */
+  --serif: "kazimirtext", serif;
+  --sans: "Libre Franklin", sans-serif;
+  --cell: 32px;
+}
+
+/* shared typographic base — backgrounds/colors are set per app file */
+body {
+  font-family: var(--sans);
+  font-smooth: never;
+  font-smoothing: antialiased;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  min-height: 100dvh;
+}

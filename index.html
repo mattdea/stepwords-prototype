@@ -22,8 +22,12 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    gap: 14px;
     padding: 16px;
+    flex-wrap: wrap;
   }
+  .divider { width: 1px; height: 26px; background: rgba(255,255,255,.1); }
+  .seg button .sub { font-size: 10px; opacity: .55; }
   .seg {
     display: inline-flex;
     background: rgba(255,255,255,.06);
@@ -78,6 +82,13 @@
 <body>
 
   <div class="toolbar">
+    <div class="seg" id="ver">
+      <button data-src="app-ben.html"><span class="lbl">Ben</span><span class="sub">faithful</span></button>
+      <button data-src="app.html" class="active"><span class="lbl">Current</span><span class="sub">trimmed</span></button>
+      <button data-src="app-bare.html"><span class="lbl">Bare</span><span class="sub">minimal</span></button>
+      <button data-src="app-pixel.html"><span class="lbl">Pixel</span><span class="sub">raccoon</span></button>
+    </div>
+    <div class="divider"></div>
     <div class="seg" id="seg">
       <button data-w="1280" data-h="800" class="active"><span class="lbl">Desktop</span><span class="dim">1280 × 800</span></button>
       <button data-w="768"  data-h="1024"><span class="lbl">Tablet</span><span class="dim">768 × 1024</span></button>
@@ -97,6 +108,7 @@
   var wrap  = document.getElementById("wrap");
   var frame = document.getElementById("frame");
   var seg   = document.getElementById("seg");
+  var ver   = document.getElementById("ver");
   var cur = { w: 1280, h: 800 };
 
   function apply(animate) {
@@ -123,6 +135,16 @@
     btn.classList.add("active");
     cur = { w: parseInt(btn.dataset.w, 10), h: parseInt(btn.dataset.h, 10) };
     apply();
+  });
+
+  // version switcher — swap the iframe to a different version, keep the device size
+  ver.addEventListener("click", function (e) {
+    var btn = e.target.closest("button");
+    if (!btn) return;
+    var btns = ver.querySelectorAll("button");
+    for (var i = 0; i < btns.length; i++) btns[i].classList.remove("active");
+    btn.classList.add("active");
+    frame.src = btn.dataset.src;   // load() fires "load" → apply() re-scales
   });
 
   window.addEventListener("resize", apply);
