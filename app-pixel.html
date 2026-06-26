@@ -98,7 +98,7 @@
 
   /* ══════════════ GAME ══════════════ */
   #screen-game { justify-content: flex-start; }
-  .g-top { width: 100%; display: flex; justify-content: flex-start; padding: 16px 16px 0; }
+  .g-top { width: 100%; display: flex; justify-content: space-between; padding: 16px 16px 0; }
   .x-btn {
     width: 38px; height: 38px; border: none; background: var(--ink-08); cursor: pointer;
     color: var(--ink-45); display: flex; align-items: center; justify-content: center; border-radius: 12px;
@@ -188,10 +188,17 @@
   @keyframes dotFade { to { opacity: .42; } }
 
   .done-title { font-family: var(--serif); font-size: 38px; font-weight: 600; margin-bottom: 8px; }
-  .done-sub { font-size: 14px; color: var(--ink-45); margin-bottom: 28px; }
-  .done-title, .done-sub, .done-actions { opacity: 0; }
+  .done-sub { font-size: 14px; color: var(--ink-45); margin-bottom: 10px; }
+  .done-time {
+    display: inline-flex; align-items: center; gap: 7px; margin-bottom: 28px;
+    font-family: var(--serif); font-size: 22px; font-weight: 600; color: var(--ink);
+    font-variant-numeric: tabular-nums;
+  }
+  .done-time .fa { font-size: 16px; color: var(--ink-45); }
+  .done-title, .done-sub, .done-time, .done-actions { opacity: 0; }
   #screen-done.active .done-title   { animation: fadeUp .55s ease both; animation-delay: 1.05s; }
   #screen-done.active .done-sub     { animation: fadeUp .55s ease both; animation-delay: 1.18s; }
+  #screen-done.active .done-time    { animation: fadeUp .55s ease both; animation-delay: 1.26s; }
   #screen-done.active .done-actions { animation: fadeUp .55s ease both; animation-delay: 1.34s; }
   @keyframes fadeUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
   .done-actions { display: flex; gap: 12px; }
@@ -220,6 +227,38 @@
     padding: 11px 20px; border-radius: 22px; opacity: 0; pointer-events: none; transition: opacity .25s, transform .25s; z-index: 60;
   }
   .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  /* ══════════════ HOW-TO MODAL (pixel: sharp corners, hard shadow) ══════════════ */
+  .modal-overlay {
+    position: fixed; inset: 0; background: rgba(23,20,16,.5); z-index: 80;
+    display: none; align-items: center; justify-content: center; padding: 24px;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    position: relative; background: var(--paper); width: 100%; max-width: 360px;
+    padding: 30px 26px 26px; display: flex; flex-direction: column; align-items: center; text-align: center;
+    border: 2px solid var(--ink); border-radius: 0; box-shadow: 8px 8px 0 rgba(23,20,16,.14);
+  }
+  .modal-close {
+    position: absolute; top: 10px; right: 10px; width: 32px; height: 32px; border: none; border-radius: 0;
+    background: var(--ink-08); color: var(--ink-45); cursor: pointer;
+    display: flex; align-items: center; justify-content: center; transition: background .15s, color .15s;
+  }
+  .modal-close:hover { background: var(--ink-14); color: var(--ink-65); }
+  .modal-close .fa { font-size: 15px; }
+  .modal-title { font-family: var(--serif); font-size: 26px; font-weight: 600; margin-bottom: 18px; }
+  .modal-demo { display: flex; flex-direction: column; gap: 5px; align-items: flex-start; margin-bottom: 20px; }
+  .md-row { display: flex; gap: 5px; }
+  .md-cell {
+    width: 26px; height: 26px; border: 1.5px solid var(--ink-25); background: var(--paper);
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--sans); font-weight: 600; font-size: 13px; color: var(--ink);
+  }
+  .md-cell.add { border-color: var(--ink); border-width: 2px; }
+  .modal-body { font-size: 14px; line-height: 1.6; color: var(--ink-65); margin-bottom: 22px; }
+  .modal-body p { margin-bottom: 9px; }
+  .modal-body p:last-child { margin-bottom: 0; }
+  .modal .btn-primary { width: 100%; padding: 13px 0; }
 
   /* larger cells / type on bigger screens */
   @media (min-width: 600px) {
@@ -261,6 +300,7 @@
   <section class="screen" id="screen-game">
     <div class="g-top">
       <button class="x-btn" id="game-back" aria-label="Back"><i class="fa">&#xf00d;</i></button>
+      <button class="x-btn" id="info-btn" aria-label="How to play"><i class="fa">&#xf05a;</i></button>
     </div>
 
     <div class="board-wrap">
@@ -280,12 +320,31 @@
       <img class="raccoon raccoon-done" src="raccoon-wave.gif" alt="" width="170" height="170">
       <h1 class="done-title" id="done-title">Nice!</h1>
       <p class="done-sub" id="done-sub">—</p>
+      <div class="done-time" id="done-time"><i class="fa">&#xf017;</i> <span id="done-time-val">0:00</span></div>
       <div class="done-actions">
         <button class="btn-ghost" id="share-btn">Share</button>
         <button class="btn-primary" id="replay-btn">Play again</button>
       </div>
     </div>
   </section>
+
+  <!-- ══════════════ HOW-TO MODAL ══════════════ -->
+  <div class="modal-overlay" id="howto">
+    <div class="modal">
+      <button class="modal-close" id="howto-close" aria-label="Close"><i class="fa">&#xf00d;</i></button>
+      <h2 class="modal-title">How to play</h2>
+      <div class="modal-demo">
+        <div class="md-row"><span class="md-cell">E</span><span class="md-cell">A</span><span class="md-cell">T</span></div>
+        <div class="md-row"><span class="md-cell add">R</span><span class="md-cell">A</span><span class="md-cell">T</span><span class="md-cell">E</span></div>
+      </div>
+      <div class="modal-body">
+        <p>Each row is one letter longer than the row above.</p>
+        <p>Rearrange the letters and add one new letter to spell the next word.</p>
+        <p>Use the clue and the length to figure out each word.</p>
+      </div>
+      <button class="btn-primary" id="howto-got-it">Got it</button>
+    </div>
+  </div>
 
 </div>
 <div class="toast" id="toast"></div>
@@ -317,6 +376,8 @@
 
   // ── state ──
   var active, cursor, work, solved, colors, justSolvedRow;
+  var startMs, solveTime = "0:00";
+  function fmt(s) { return Math.floor(s / 60) + ":" + ("0" + (s % 60)).slice(-2); }
 
   function show(name) {
     var s = document.querySelectorAll(".screen");
@@ -416,6 +477,7 @@
     solved = []; colors = []; work = [];
     for (var i = 0; i < N; i++) { solved.push(false); colors.push(null); work.push(makeWork(i)); }
     active = 0; cursor = 0; justSolvedRow = -1;
+    startMs = performance.now();        // track total solve time (no visible timer)
     renderBoard(); renderKeyboard(); renderClue();
     show("game");
     requestAnimationFrame(fitBoard);
@@ -499,6 +561,8 @@
 
   // ── completion ──
   function finish() {
+    solveTime = fmt(Math.round((performance.now() - startMs) / 1000));
+    $("done-time-val").textContent = solveTime;
     $("done-sub").textContent = dateFull;
     show("done");
     setTimeout(confetti, 450);
@@ -541,6 +605,14 @@
   $("replay-btn").addEventListener("click", start);
   $("game-back").addEventListener("click", function () { show("home"); });
 
+  // how-to modal
+  function openHowto() { $("howto").classList.add("open"); }
+  function closeHowto() { $("howto").classList.remove("open"); }
+  $("info-btn").addEventListener("click", openHowto);
+  $("howto-close").addEventListener("click", closeHowto);
+  $("howto-got-it").addEventListener("click", closeHowto);
+  $("howto").addEventListener("click", function (e) { if (e.target === this) closeHowto(); });
+
   $("keyboard").addEventListener("click", function (e) {
     var k = e.target.closest(".key");
     if (!k) return;
@@ -566,7 +638,7 @@
   });
 
   $("share-btn").addEventListener("click", function () {
-    var lines = ["Stepwords — Today's Climb", dateFull, ""];
+    var lines = ["Stepwords — Today's Climb", dateFull + " · " + solveTime, ""];
     PUZZLE.rows.forEach(function (row, i) {
       var s = "";
       for (var c = 0; c < row.word.length; c++) { s += (colors[i] && colors[i][c] === "yellow") ? "🟨" : "🟩"; }
