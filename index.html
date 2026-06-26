@@ -57,6 +57,17 @@
   .seg button.active { background: #f4f2ea; color: #1c1c1e; }
   .seg button.active .dim { opacity: .6; }
 
+  /* ── open-in-new-tab button ── */
+  .open-btn {
+    display: inline-flex; align-items: center; gap: 7px;
+    background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.07);
+    color: rgba(232,230,225,.7); font-family: inherit; font-size: 13px; font-weight: 500;
+    padding: 9px 15px; border-radius: 11px; cursor: pointer;
+    transition: background .15s, color .15s;
+  }
+  .open-btn:hover { background: rgba(255,255,255,.1); color: rgba(232,230,225,.95); }
+  .open-btn .arr { font-size: 15px; line-height: 1; }
+
   /* ── stage holds the scaled device window ── */
   .stage {
     flex: 1;
@@ -94,6 +105,8 @@
       <button data-w="768"  data-h="1024"><span class="lbl">Tablet</span><span class="dim">768 × 1024</span></button>
       <button data-w="390"  data-h="844"><span class="lbl">Mobile</span><span class="dim">390 × 844</span></button>
     </div>
+    <div class="divider"></div>
+    <button id="open-tab" class="open-btn" title="Open this version in a new tab (no device frame)">Open <span class="arr">&#8599;</span></button>
   </div>
 
   <div class="stage" id="stage">
@@ -109,7 +122,9 @@
   var frame = document.getElementById("frame");
   var seg   = document.getElementById("seg");
   var ver   = document.getElementById("ver");
+  var openBtn = document.getElementById("open-tab");
   var cur = { w: 1280, h: 800 };
+  var curSrc = "app.html";   // the version currently in the frame
 
   function apply(animate) {
     // the iframe's CSS size IS its viewport, so the game's media queries respond to it
@@ -144,7 +159,13 @@
     var btns = ver.querySelectorAll("button");
     for (var i = 0; i < btns.length; i++) btns[i].classList.remove("active");
     btn.classList.add("active");
-    frame.src = btn.dataset.src;   // load() fires "load" → apply() re-scales
+    curSrc = btn.dataset.src;
+    frame.src = curSrc;   // load() fires "load" → apply() re-scales
+  });
+
+  // open the current version's raw page (no device frame) in a new tab
+  openBtn.addEventListener("click", function () {
+    window.open(curSrc, "_blank", "noopener");
   });
 
   window.addEventListener("resize", apply);
