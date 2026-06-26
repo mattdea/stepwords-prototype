@@ -146,7 +146,7 @@
   }
   .key.avail { color: var(--ink); font-weight: 600; }
   @media (hover: hover) { .key:hover { box-shadow: 0 0 0 1px var(--ink-14), 0 1px 3px rgba(23,20,16,.07); } }
-  .key:active { transform: translateY(1px); }
+  .key:active { transform: translateY(1px); box-shadow: 0 0 0 1px var(--ink-14), 0 1px 3px rgba(23,20,16,.07); }
   .key.wide { flex: 1.65; max-width: 66px; padding: 0 4px; font-size: 11px; letter-spacing: .03em; text-transform: uppercase; font-weight: 600; }
   .key.submit { background: var(--accent); color: #fff; }
   .key.submit:hover { background: var(--accent-hover); }
@@ -562,6 +562,9 @@
     if (!cell || cell.dataset.row === undefined) return;
     selectRow(parseInt(cell.dataset.row, 10), parseInt(cell.dataset.col, 10));
   });
+
+  // iOS Safari only applies :active press states when a touch listener exists
+  document.addEventListener("touchstart", function () {}, { passive: true });
 
   document.addEventListener("keydown", function (e) {
     if (!$("screen-game").classList.contains("active")) return;
