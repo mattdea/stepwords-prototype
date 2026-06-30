@@ -194,7 +194,7 @@
     font-family: var(--serif); font-size: 22px; font-weight: 600; color: var(--ink);
     font-variant-numeric: tabular-nums;
   }
-  .done-time .fa { font-size: 16px; color: var(--ink-45); }
+  .done-time .fa { font-size: 16px; color: var(--ink-45); position: relative; top: 1.5px; }   /* down to the time's optical center */
   .done-title, .done-sub, .done-time, .done-actions { opacity: 0; }
   #screen-done.active .done-title   { animation: fadeUp .55s ease both; animation-delay: 1.05s; }
   #screen-done.active .done-sub     { animation: fadeUp .55s ease both; animation-delay: 1.18s; }
@@ -416,6 +416,7 @@
         var letter = "";
         if (solved[i]) {
           cell.classList.add("solved", colors[i][c]);
+          cell.dataset.row = i; cell.dataset.col = c;   // solved rows stay clickable to view the clue
           letter = row.word[c];
           if (i === justSolvedRow) { cell.classList.add("pop"); cell.style.setProperty("--col", c); }
         } else {

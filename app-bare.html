@@ -347,6 +347,7 @@
         var letter = "";
         if (solved[i]) {
           cell.classList.add("solved", colors[i][c]);
+          cell.dataset.row = i; cell.dataset.col = c;   // solved rows stay clickable to view the clue
           letter = row.word[c];
           if (i === justSolvedRow) { cell.classList.add("pop"); cell.style.setProperty("--col", c); }
         } else {

@@ -32,7 +32,7 @@
 
   /* ── palette overrides (Sanzo Wada), scoped to Ben's version ── */
   :root {
-    --bg: #f8f4e9;                      /* main background → ivory */
+    --bg: #f4f2ea;                      /* main background → match the other versions */
     --ink: #1c1c1c;                     /* dark/black text → charcoal */
     --ink-65: rgba(28,28,28,.65);
     --ink-25: rgba(28,28,28,.25);
@@ -71,7 +71,7 @@
     position: sticky; top: 0; z-index: 40;
     display: flex; align-items: center; justify-content: space-between;
     min-height: var(--bar-h); padding: 0 var(--bar-px);
-    background: rgba(248,244,233,.86);
+    background: rgba(244,242,234,.86);
     backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
     border-bottom: 1px solid var(--ink-08);
   }
@@ -111,14 +111,14 @@
      pinned under the navbar (it sits above the scrolling board), frosted to match. */
   .game-head {
     position: relative; display: flex; flex-direction: column;
-    background: rgba(248,244,233,.86);
+    background: rgba(244,242,234,.86);
     backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
     border-bottom: 1px solid var(--ink-08);
   }
   .gh-row {
     display: flex; align-items: center; justify-content: space-between; gap: 8px;
     min-height: var(--bar-h); padding: 0 var(--bar-px);
-    background: rgba(248,244,233,.86); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+    background: rgba(244,242,234,.86); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
   }
   .gh-row-a { border-bottom: 1px solid var(--ink-08); }   /* divider between the two rows */
   .gh-row-b { border-bottom: 1px solid var(--ink-08); }   /* line beneath the (sticky) toolbar */
@@ -205,7 +205,7 @@
   /* frosted dock pinned to the bottom of the viewport; the board scrolls underneath */
   .play-dock {
     position: fixed; left: 0; right: 0; bottom: 0; z-index: 20;
-    background: rgba(248,244,233,.86); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+    background: rgba(244,242,234,.86); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
     border-top: 1px solid var(--ink-08);
   }
   .clue-bar { min-height: var(--bar-h); padding: 0 var(--bar-px); display: flex; align-items: center; gap: 10px; position: relative; z-index: 2; border-bottom: 1px solid var(--ink-08); }
@@ -875,6 +875,7 @@
 
         if (solved[i]) {
           cell.classList.add("solved", colors[i][c]);
+          cell.dataset.row = i; cell.dataset.col = c;   // solved rows stay clickable to view the clue
           letter = row.word[c];
           if (i === justSolvedRow) { cell.classList.add("solve-bounce"); cell.style.setProperty("--col", c); }
         } else {
