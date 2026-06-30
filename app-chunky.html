@@ -813,15 +813,12 @@
   function renderKeyboard() {
     var kb = $("keyboard");
     kb.innerHTML = "";
-    var avail = {};
-    PUZZLE.rows[active].word.split("").forEach(function (ch) { avail[ch] = true; });
-
     KB.forEach(function (line, ri) {
       var rowEl = document.createElement("div");
       rowEl.className = "kb-row";
       if (ri === 2) rowEl.appendChild(makeKey("Submit", "submit"));
       line.split("").forEach(function (ch) {
-        var k = makeKey(ch, avail[ch] ? "avail" : "");
+        var k = makeKey(ch, "avail");
         k.dataset.letter = ch;
         rowEl.appendChild(k);
       });
