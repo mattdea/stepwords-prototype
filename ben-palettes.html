@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Stepwords — Sanzo Wada color combos</title>
+<!-- load fonts directly (more reliable than the nested @import in the tokens file) -->
+<link rel="preconnect" href="https://use.typekit.net" crossorigin>
+<link rel="preconnect" href="https://p.typekit.net" crossorigin>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://use.typekit.net/cst1gej.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@300;400;500;600&display=swap">
+<link rel="stylesheet" href="stepwords-tokens.css">
+<style>
+  :root {
+    /* override the tokens' bare fallbacks with graceful ones, so the page still
+       reads as editorial even if Typekit/Google are blocked or the origin isn't whitelisted */
+    --serif:"kazimirtext", Georgia, "Times New Roman", serif;
+    --sans:"Libre Franklin", system-ui, -apple-system, "Segoe UI", sans-serif;
+    --ivory:#f8f4e9; --cream:#f3ebda; --char:#1c1c1c;
+    --ink-65:rgba(28,28,28,.65); --ink-45:rgba(28,28,28,.45);
+    --ink-25:rgba(28,28,28,.25); --ink-14:rgba(28,28,28,.14); --ink-08:rgba(28,28,28,.07);
+  }
+  body { background:#e7e3d7; color:var(--char); font-family:var(--sans); padding:38px 28px 90px; }
+  .head { max-width:1180px; margin:0 auto 10px; }
+  .head h1 { font-family:var(--serif); font-weight:600; font-size:30px; letter-spacing:-.01em; }
+  .head p { font-size:14px; color:var(--ink-65); margin-top:8px; max-width:680px; line-height:1.55; }
+
+  /* source palette strip */
+  .source { max-width:1180px; margin:18px auto 30px; }
+  .source .lbl { font-size:11px; letter-spacing:.08em; text-transform:uppercase; color:var(--ink-45); margin-bottom:8px; }
+  .swrow { display:flex; flex-wrap:wrap; gap:8px; }
+  .sw { display:flex; flex-direction:column; gap:5px; align-items:center; width:78px; }
+  .sw .box { width:78px; height:50px; border-radius:9px; border:1px solid var(--ink-14); }
+  .sw .nm { font-size:10.5px; font-weight:600; }
+  .sw .hx { font-size:9.5px; color:var(--ink-45); font-variant-numeric:tabular-nums; }
+
+  .group-h { max-width:1180px; margin:34px auto 14px; display:flex; align-items:baseline; gap:12px; }
+  .group-h h2 { font-family:var(--serif); font-weight:600; font-size:20px; }
+  .group-h .cnt { font-size:12px; color:var(--ink-45); }
+
+  .grid { max-width:1180px; margin:0 auto; display:grid; grid-template-columns:repeat(auto-fill,minmax(330px,1fr)); gap:22px; }
+
+  .card { background:#fff; border-radius:18px; overflow:hidden; box-shadow:0 1px 3px rgba(0,0,0,.07),0 10px 26px rgba(0,0,0,.06); }
+  .card-head { display:flex; align-items:baseline; justify-content:space-between; gap:10px; padding:14px 16px 10px; }
+  .card-head .nm { font-family:var(--serif); font-weight:600; font-size:16px; }
+  .card-head .tot { font-size:11px; color:var(--ink-45); white-space:nowrap; }
+  .chips { display:flex; flex-wrap:wrap; gap:5px 9px; padding:2px 16px 12px; }
+  .chip { display:flex; align-items:center; gap:6px; font-size:10px; color:var(--ink-65); }
+  .chip i { width:14px; height:14px; border-radius:4px; border:1px solid var(--ink-14); }
+  .chip b { font-weight:600; color:var(--char); }
+
+  /* ── the vignette ── */
+  .vig { padding:16px; display:flex; flex-direction:column; gap:12px; }
+  .panel { border-radius:13px; padding:16px 16px 18px; border:1px solid var(--ink-08); box-shadow:0 1px 2px rgba(0,0,0,.04); }
+  .v-head { display:flex; align-items:center; justify-content:space-between; }
+  .v-head .wm { font-family:var(--serif); font-weight:600; font-size:21px; color:var(--char); }
+  .v-head .stars { font-size:13px; letter-spacing:2px; }
+
+  .tiles { display:flex; flex-direction:column; gap:4px; margin:13px 0 3px; }
+  .trow { display:flex; gap:4px; align-items:center; }
+  .trow .num { width:13px; font-size:10px; color:var(--ink-25); text-align:right; margin-right:3px; }
+  .t { width:30px; height:30px; border-radius:6px; display:flex; align-items:center; justify-content:center;
+       font-family:var(--serif); font-weight:600; font-size:15px; flex-shrink:0; }
+  .t.empty { border:1px solid var(--ink-08); }
+  .t.cursor { border:1.5px solid; background:transparent; }
+
+  .clue { text-align:center; font-family:var(--serif); font-size:14px; font-weight:500; color:var(--char); margin:11px 0 2px; }
+  .clue .len { color:var(--ink-45); }
+
+  .btns { display:flex; align-items:center; gap:8px; margin-top:13px; flex-wrap:wrap; }
+  .btn { border:none; cursor:default; font-family:var(--sans); font-weight:600; font-size:12px; border-radius:20px; padding:9px 20px; }
+  .btn.ghost { background:transparent; border:1.5px solid var(--char); color:var(--char); }
+  .btn.tag { padding:7px 14px; border-radius:8px; font-size:11px; }
+
+  /* semantic / "card with text" panel */
+  .sem .sem-t { font-family:var(--sans); font-weight:600; font-size:11px; letter-spacing:.06em; text-transform:uppercase; color:var(--ink-45); margin-bottom:10px; }
+  .sem-rows { display:flex; flex-direction:column; gap:8px; }
+  .sem-r { display:flex; align-items:center; gap:10px; }
+  .sem-r .dot { width:24px; height:24px; border-radius:7px; flex-shrink:0; }
+  .sem-r .role { font-size:12.5px; font-weight:600; }
+  .sem-r .hx { margin-left:auto; font-size:10.5px; color:var(--ink-45); font-variant-numeric:tabular-nums; }
+  .pills { display:flex; flex-wrap:wrap; gap:6px; margin-top:12px; }
+  .pill { font-size:11px; font-weight:600; padding:5px 11px; border-radius:20px; }
+</style>
+</head>
+<body>
+  <div class="head">
+    <h1>Stepwords — color combinations</h1>
+    <p>Built from your Sanzo Wada selections. Every card keeps the same recipe — a <b>cream/ivory background</b>
+       and <b>charcoal text</b> — and varies only the accents drawn from the palette. Cards are grouped by how many
+       colors the combo uses, from a single accent up to the whole set, so you can see how each scales into brand,
+       UI, and semantic roles.</p>
+  </div>
+
+  <div class="source">
+    <div class="lbl">Source palette</div>
+    <div class="swrow" id="source"></div>
+  </div>
+
+  <div id="page"></div>
+
+<script>
+  // fixed metadata for every hex (name + a sensible default semantic role, by hue)
+  var META = {
+    "#f8f4e9":{nm:"Ivory",     role:"Background"},
+    "#f3ebda":{nm:"Cream",     role:"Background"},
+    "#1c1c1c":{nm:"Charcoal",  role:"Text / ink"},
+    "#1e4b8a":{nm:"Indigo",    role:"Primary"},
+    "#d8453a":{nm:"Vermilion", role:"Error"},
+    "#f28c28":{nm:"Marigold",  role:"Warning"},
+    "#f5b71c":{nm:"Citron",    role:"Highlight"},
+    "#a7c957":{nm:"Leaf",      role:"Success"},
+    "#78cdd0":{nm:"Aqua",      role:"Info"},
+    "#a36aa5":{nm:"Mauve",     role:"Brand"},
+    "#f27291":{nm:"Rose",      role:"Accent"}
+  };
+  var ACCENTS = ["#1e4b8a","#d8453a","#f28c28","#f5b71c","#a7c957","#78cdd0","#a36aa5","#f27291"];
+  var WARM = ["#f5b71c","#f28c28","#d8453a","#f27291","#a36aa5"]; // for stars
+
+  // contrast: dark or light text on a given fill
+  function fg(hex){
+    var c=hex.replace("#",""), r=parseInt(c.substr(0,2),16)/255, g=parseInt(c.substr(2,2),16)/255, b=parseInt(c.substr(4,2),16)/255;
+    function L(v){return v<=.03928? v/12.92 : Math.pow((v+.055)/1.055,2.4);}
+    var lum=.2126*L(r)+.7152*L(g)+.0722*L(b);
+    return lum>.42 ? "#1c1c1c" : "#f8f4e9";
+  }
+
+  // ── source strip ──
+  var src=document.getElementById("source");
+  ["#f8f4e9","#f3ebda","#1c1c1c","#1e4b8a","#d8453a","#f28c28","#f5b71c","#a7c957","#78cdd0","#a36aa5","#f27291"].forEach(function(h){
+    var m=META[h];
+    src.insertAdjacentHTML("beforeend",
+      '<div class="sw"><div class="box" style="background:'+h+'"></div><div class="nm">'+m.nm+'</div><div class="hx">'+h+'</div></div>');
+  });
+
+  // ── combos, grouped by accent count ──
+  var GROUPS = [
+    { title:"One accent", desc:"cream · charcoal · 1 color", items:[
+      { name:"Indigo",        bg:"#f8f4e9", acc:["#1e4b8a"] },
+      { name:"Vermilion",     bg:"#f3ebda", acc:["#d8453a"] },
+      { name:"Marigold",      bg:"#f8f4e9", acc:["#f28c28"] }
+    ]},
+    { title:"Two accents", desc:"cream · charcoal · 2 colors", items:[
+      { name:"Navy & Citron",     bg:"#f3ebda", acc:["#1e4b8a","#f5b71c"] },
+      { name:"Rose & Aqua",       bg:"#f8f4e9", acc:["#f27291","#78cdd0"] },
+      { name:"Vermilion & Teal",  bg:"#f3ebda", acc:["#d8453a","#78cdd0"] }
+    ]},
+    { title:"Three accents", desc:"cream · charcoal · 3 colors", items:[
+      { name:"Bauhaus Primaries", bg:"#f8f4e9", acc:["#1e4b8a","#d8453a","#f5b71c"] },
+      { name:"Sunset",            bg:"#f3ebda", acc:["#f28c28","#f27291","#a36aa5"] },
+      { name:"Garden",            bg:"#f8f4e9", acc:["#a7c957","#78cdd0","#f5b71c"] }
+    ]},
+    { title:"Four accents", desc:"cream · charcoal · 4 colors", items:[
+      { name:"Carnival",   bg:"#f3ebda", acc:["#d8453a","#f28c28","#f5b71c","#1e4b8a"] }
+    ]},
+    { title:"Five accents", desc:"cream · charcoal · 5 colors", items:[
+      { name:"Jewelbox",   bg:"#f8f4e9", acc:["#a36aa5","#1e4b8a","#78cdd0","#a7c957","#f27291"] }
+    ]},
+    { title:"Six accents", desc:"cream · charcoal · 6 colors", items:[
+      { name:"Wide Gamut", bg:"#f3ebda", acc:["#f27291","#a36aa5","#1e4b8a","#78cdd0","#a7c957","#f28c28"] }
+    ]},
+    { title:"The whole set", desc:"cream · charcoal · all 8 colors", items:[
+      { name:"Full Spectrum", bg:"#f8f4e9", acc:ACCENTS.slice() }
+    ]}
+  ];
+
+  function tilesMarkup(A, primary){
+    // a short staircase whose filled cells cycle through the combo's accents
+    var letters=["S","T","E","P","W","O","R","D","S"];
+    var n=A.length;
+    var row1="", row2="";
+    // row 1: up to 4 accent-filled tiles
+    for(var i=0;i<Math.min(4, Math.max(n,1)); i++){
+      var col = A[i % n];
+      row1 += '<div class="t" style="background:'+col+';color:'+fg(col)+'">'+letters[i]+'</div>';
+    }
+    // row 2: a couple more + a cursor + an empty cell
+    var start=Math.min(4, Math.max(n,1));
+    for(var j=0;j<Math.min(3,n);j++){
+      var col2=A[(start+j) % n];
+      row2 += '<div class="t" style="background:'+col2+';color:'+fg(col2)+'">'+letters[(start+j)%letters.length]+'</div>';
+    }
+    row2 += '<div class="t cursor" style="border-color:'+primary+';color:'+primary+'">E</div>';
+    row2 += '<div class="t empty"></div>';
+    return '<div class="tiles"><div class="trow"><span class="num">1</span>'+row1+'</div>'+
+           '<div class="trow"><span class="num">2</span>'+row2+'</div></div>';
+  }
+
+  function semMarkup(A){
+    var rows = A.map(function(h){
+      var m=META[h];
+      return '<div class="sem-r"><span class="dot" style="background:'+h+'"></span>'+
+             '<span class="role">'+m.role+'</span><span class="hx">'+m.nm+' · '+h+'</span></div>';
+    }).join("");
+    var pills = A.map(function(h){
+      var m=META[h];
+      return '<span class="pill" style="background:'+h+';color:'+fg(h)+'">'+m.role+'</span>';
+    }).join("");
+    return '<div class="panel sem"><div class="sem-t">Semantic roles</div><div class="sem-rows">'+rows+'</div>'+
+           '<div class="pills">'+pills+'</div></div>';
+  }
+
+  function card(c){
+    var A=c.acc, primary=A[0], total=2+A.length; // 1 cream + 1 charcoal + accents
+    var star = WARM.filter(function(w){return A.indexOf(w)>-1;})[0];
+    var starColor = star || "rgba(28,28,28,.3)";
+    var bgName = META[c.bg].nm;
+
+    // chips: bg, charcoal, then accents
+    var chips = '<span class="chip"><i style="background:'+c.bg+'"></i><b>'+bgName+'</b></span>'+
+                '<span class="chip"><i style="background:#1c1c1c"></i><b>Charcoal</b></span>'+
+                A.map(function(h){return '<span class="chip"><i style="background:'+h+'"></i>'+META[h].nm+'</span>';}).join("");
+
+    // second filled button only when there's a 2nd accent
+    var tagBtn = A.length>1 ? '<button class="btn tag" style="background:'+A[1]+';color:'+fg(A[1])+'">'+META[A[1]].role+'</button>' : "";
+    // semantic panel appears once a combo has 2+ accents (it's the "card with text")
+    var sem = A.length>=2 ? semMarkup(A) : "";
+
+    return '<div class="card">'+
+      '<div class="card-head"><span class="nm">'+c.name+'</span><span class="tot">'+total+' colors</span></div>'+
+      '<div class="chips">'+chips+'</div>'+
+      '<div class="vig" style="background:'+c.bg+'">'+
+        '<div class="panel" style="background:'+c.bg+'">'+
+          '<div class="v-head"><span class="wm">Stepwords</span><span class="stars" style="color:'+starColor+'">★★★</span></div>'+
+          tilesMarkup(A, primary)+
+          '<div class="clue">Speed or charge <span class="len">(4)</span></div>'+
+          '<div class="btns">'+
+            '<button class="btn" style="background:'+primary+';color:'+fg(primary)+'">Play</button>'+
+            '<button class="btn ghost">How to play</button>'+
+            tagBtn+
+          '</div>'+
+        '</div>'+
+        sem+
+      '</div>'+
+    '</div>';
+  }
+
+  var page=document.getElementById("page");
+  GROUPS.forEach(function(g){
+    var html='<div class="group-h"><h2>'+g.title+'</h2><span class="cnt">'+g.desc+'</span></div>'+
+             '<div class="grid">'+g.items.map(card).join("")+'</div>';
+    page.insertAdjacentHTML("beforeend", html);
+  });
+</script>
+</body>
+</html>

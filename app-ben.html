@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Stepwords — Ben-faithful</title>
+<title>Stepwords — Current</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="stepwords-tokens.css">
@@ -29,6 +29,21 @@
   .icon-square .fa { font-size: 15px; color: rgba(23,20,16,.5); }
   .clue-bar .arrow .fa { font-size: 15px; color: rgba(23,20,16,.45); }
   .key.back .fa { font-size: 16px; color: var(--ink-45); }
+
+  /* ── palette overrides (Sanzo Wada), scoped to Ben's version ── */
+  :root {
+    --bg: #f8f4e9;                      /* main background → ivory */
+    --ink: #1c1c1c;                     /* dark/black text → charcoal */
+    --ink-65: rgba(28,28,28,.65);
+    --ink-25: rgba(28,28,28,.25);
+    --ink-14: rgba(28,28,28,.14);
+    --ink-08: rgba(28,28,28,.08);
+    --accent: #1e4b8a;                  /* primary blue → indigo */
+    --accent-hover: #24579e;
+    --accent-press: #173a6b;
+    --accent-light: rgba(30,75,138,.12);
+    --gold: #f5b71c;                    /* stars yellow → citron */
+  }
 
   body {
     background: var(--bg);
@@ -56,7 +71,7 @@
     position: sticky; top: 0; z-index: 40;
     display: flex; align-items: center; justify-content: space-between;
     min-height: var(--bar-h); padding: 0 var(--bar-px);
-    background: rgba(244,242,234,.86);
+    background: rgba(248,244,233,.86);
     backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
     border-bottom: 1px solid var(--ink-08);
   }
@@ -96,14 +111,14 @@
      pinned under the navbar (it sits above the scrolling board), frosted to match. */
   .game-head {
     position: relative; display: flex; flex-direction: column;
-    background: rgba(244,242,234,.86);
+    background: rgba(248,244,233,.86);
     backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
     border-bottom: 1px solid var(--ink-08);
   }
   .gh-row {
     display: flex; align-items: center; justify-content: space-between; gap: 8px;
     min-height: var(--bar-h); padding: 0 var(--bar-px);
-    background: rgba(244,242,234,.86); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+    background: rgba(248,244,233,.86); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
   }
   .gh-row-a { border-bottom: 1px solid var(--ink-08); }   /* divider between the two rows */
   .gh-row-b { border-bottom: 1px solid var(--ink-08); }   /* line beneath the (sticky) toolbar */
@@ -190,7 +205,7 @@
   /* frosted dock pinned to the bottom of the viewport; the board scrolls underneath */
   .play-dock {
     position: fixed; left: 0; right: 0; bottom: 0; z-index: 20;
-    background: rgba(244,242,234,.86); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+    background: rgba(248,244,233,.86); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
     border-top: 1px solid var(--ink-08);
   }
   .clue-bar { min-height: var(--bar-h); padding: 0 var(--bar-px); display: flex; align-items: center; gap: 10px; position: relative; z-index: 2; border-bottom: 1px solid var(--ink-08); }
@@ -296,13 +311,13 @@
     background: var(--paper); border-radius: 16px; padding: 18px; margin-bottom: 14px;
     box-shadow: 0 1px 4px rgba(23,20,16,.06);
   }
-  .card.accent { border: 1.5px solid var(--accent-light); background: linear-gradient(var(--paper),var(--paper)) padding-box, var(--paper); }
-  .card.accent { box-shadow: 0 1px 4px rgba(23,20,16,.06), inset 0 0 0 1px rgba(29,63,110,.15); background: rgba(29,63,110,.03); }
-  .card.gold { box-shadow: 0 1px 4px rgba(23,20,16,.06), inset 0 0 0 1px rgba(197,150,10,.28); background: rgba(197,150,10,.05); }
+  /* main/quick cards share the same plain white treatment as the badges card;
+     their identity comes from the colored dot, title, tag and chart fills */
+  .card.accent, .card.gold { background: var(--paper); border: none; box-shadow: 0 1px 4px rgba(23,20,16,.06); }
   .card h3 { font-family: var(--serif); font-size: 18px; font-weight: 600; margin-bottom: 12px; }
   .card .card-tag { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; }
   .card.accent .card-tag { color: var(--accent); }
-  .card.gold .card-tag { color: #a8820a; }
+  .card.gold .card-tag { color: #f5b71c; }
 
   .btn {
     border: none; border-radius: 22px; font-family: var(--sans); font-size: 13px; font-weight: 600;
@@ -329,7 +344,7 @@
   }
   .arch-nav .icon-square svg { width: 12px; height: 12px; }
   .arch-cal-title { font-family: var(--serif); font-size: 16px; font-weight: 600; margin-bottom: 4px; }
-  .arch-cal-title.gold-t { color: #a8820a; }
+  .arch-cal-title.gold-t { color: #f5b71c; }
   .arch-cal-title.accent-t { color: var(--accent); }
   .arch-weekdays { display: grid; grid-template-columns: repeat(7, 1fr); margin-bottom: 4px; }
   .arch-weekdays span { text-align: center; font-family: var(--sans); font-size: 10.5px; color: var(--ink-45); letter-spacing: .04em; }
@@ -345,8 +360,8 @@
   .day .glyph .cal-star { color: var(--gold); font-size: 9px; }
   .day .glyph .cal-star.zero { color: var(--ink-25); }
   .day.completed { background: var(--bg); }
-  .day.failed { background: rgba(217,64,48,.08); }
-  .day.failed .dnum { color: #b23a2e; }
+  .day.failed { background: rgba(216,69,58,.08); }
+  .day.failed .dnum { color: #d8453a; }
   .day.progress { background: rgba(29,63,110,.07); }
   .day.empty .dnum { color: var(--ink-45); }
   .day.future { cursor: default; opacity: .5; border-color: transparent; }
@@ -375,7 +390,7 @@
   .badge.earned { border-color: var(--green); color: var(--ink); font-weight: 600; background: rgba(109,198,143,.12); }
   .badge.locked { border-style: dashed; opacity: .65; }
   .badge .fa { font-size: 11px; margin-right: 3px; }
-  .badge.earned .fa { color: #c79a1e; }
+  .badge.earned .fa { color: #f5b71c; }
   .badge.locked .fa { color: var(--ink-25); }
 
   /* stats */
@@ -390,16 +405,33 @@
   .stars-chart .lab { width: 32px; font-size: 12px; color: var(--ink-65); flex-shrink: 0; display: inline-flex; align-items: center; gap: 2px; }
   .lab-star { color: var(--gold); font-size: 10px; }
   .stars-chart .bar-bg { flex: 1; height: 10px; background: rgba(23,20,16,.06); border-radius: 6px; overflow: hidden; }
-  .stars-chart .bar-fill { height: 100%; border-radius: 6px; }
+  .stars-chart .bar-fill { display: block; height: 100%; border-radius: 6px; }
   .stars-chart .cnt { width: 26px; text-align: right; font-size: 12px; color: var(--ink-45); font-variant-numeric: tabular-nums; flex-shrink: 0; }
   .solved-block { display: flex; align-items: baseline; gap: 12px; }
   .solved-block .pct { font-family: var(--serif); font-size: 30px; font-weight: 600; }
   .solved-block .meta { font-size: 12.5px; color: var(--ink-45); line-height: 1.5; }
 
+  /* ── stats cards: dot header · 2×2 (mobile) / 1×4 (desktop) tile grid · distribution sub-card ── */
+  .stat-card-head { display: flex; align-items: center; gap: 9px; margin-bottom: 14px; }
+  .stat-card-head h3 { margin: 0; line-height: 1; }   /* kill the inherited margin-bottom so the dot centers on the text */
+  .stat-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; position: relative; top: 0.75px; }
+  .card.accent .stat-dot { background: var(--accent); }
+  .card.gold .stat-dot { background: var(--gold); }
+  .stat-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 12px; }
+  .stat-tile { background: rgba(28,28,28,.045); border-radius: 12px; padding: 13px 14px; display: flex; flex-direction: column; gap: 5px; }
+  .stat-tile .st-l { font-size: 11.5px; color: var(--ink-45); }
+  .stat-tile .st-v { font-family: var(--serif); font-size: 24px; font-weight: 600; line-height: 1; display: inline-flex; align-items: center; gap: 6px; }
+  .stat-tile .st-v .flame { font-size: 15px; color: #d8453a; position: relative; top: 1.5px; }   /* down to the digit's optical center */
+  .stat-tile .st-sub { font-size: 11px; color: var(--ink-45); }
+  .stat-section { background: rgba(28,28,28,.045); border-radius: 12px; padding: 14px 14px 12px; }
+  .stat-section .st-title { font-size: 11.5px; color: var(--ink-45); margin-bottom: 10px; }
+  /* fixed-width digit so the stars line up across all four rows */
+  .stars-chart .lab .d { display: inline-block; width: 10px; text-align: center; font-variant-numeric: tabular-nums; }
+
   /* create form */
   .form-row { margin-bottom: 14px; }
   .form-row label { display: block; font-size: 12px; font-weight: 600; color: var(--ink-65); margin-bottom: 5px; }
-  .form-row label .req { color: #c2402f; }
+  .form-row label .req { color: #d8453a; }
   .field {
     width: 100%; font-family: var(--sans); font-size: 14px; color: var(--ink); background: var(--paper);
     border: 1px solid var(--ink-08); border-radius: 10px; padding: 10px 12px;
@@ -479,6 +511,7 @@
     .key.back svg { width: 26px; }
     /* tall screens centered column */
     .scroll .page { max-width: 720px; margin: 0 auto; }
+    .stat-grid { grid-template-columns: repeat(4, 1fr); }   /* 1×4 row on desktop */
     .done-wrap .stat-strip, .done-wrap .share-btn { max-width: 360px; }
   }
 </style>
@@ -519,7 +552,7 @@
       <div class="gh-row gh-row-b">
         <div class="gh-left">
           <span class="stars" id="stars"></span>
-          <span class="streak-chip"><i class="fa" style="color:#d94030;font-size:13px">&#xf06d;</i> <span id="streak-count">0</span></span>
+          <span class="streak-chip"><i class="fa" style="color:#d8453a;font-size:13px">&#xf06d;</i> <span id="streak-count">0</span></span>
           <span class="timer" id="timer">0:00</span>
         </div>
         <div class="gh-right">
@@ -586,7 +619,7 @@
         <span><span class="lg-stars"><i class="fa">&#xf005;</i><i class="fa">&#xf005;</i></span> 2 stars</span>
         <span><span class="lg-stars"><i class="fa">&#xf005;</i></span> 1 star</span>
         <span><i class="fa lg-zero">&#xf005;</i> 0 stars</span>
-        <span><i class="fa" style="color:#c2402f">&#xf057;</i> Failed</span>
+        <span><i class="fa" style="color:#d8453a">&#xf057;</i> Failed</span>
         <span><i class="fa" style="color:var(--accent)">&#xf70c;</i> In progress</span>
         <span><svg viewBox="0 0 576 512" fill="var(--ink-45)"><path d="M326.8 101.6C326.8 80.2494 344.049 63 365.4 63H519.8C541.151 63 558.4 80.2494 558.4 101.6C558.4 122.951 541.151 140.2 519.8 140.2H404V256C404 277.351 386.751 294.6 365.4 294.6H249.6V410.4C249.6 431.751 232.351 449 211 449H56.6C31.8719 449 18 434.5 18 410.4C18 389.049 35.2494 371.8 56.6 371.8H172.4V256C172.4 234.649 189.649 217.4 211 217.4H326.8V101.6Z"/></svg> Not started</span>
       </div>
@@ -616,46 +649,40 @@
       <div class="page-head"><h1>Your Stats</h1></div>
 
       <div class="card accent">
-        <div class="card-tag">Main Puzzle</div>
-        <div class="divider"></div>
-        <div class="streak-block">
-          <div class="sb"><span class="n">0</span><span class="l">Current streak</span></div>
-          <div class="sb"><span class="n">0</span><span class="l">Longest streak</span></div>
+        <div class="stat-card-head"><span class="stat-dot"></span><h3>Main Puzzle</h3></div>
+        <div class="stat-grid">
+          <div class="stat-tile"><span class="st-l">Current streak</span><span class="st-v"><i class="fa flame">&#xf06d;</i>5</span></div>
+          <div class="stat-tile"><span class="st-l">Longest streak</span><span class="st-v">12</span></div>
+          <div class="stat-tile"><span class="st-l">Solved</span><span class="st-v">9%</span><span class="st-sub">27/290 puzzles</span></div>
+          <div class="stat-tile"><span class="st-l">Avg time</span><span class="st-v">4:38</span></div>
         </div>
-        <div class="hint-line">Solve today's main puzzle to start!</div>
-        <div class="divider"></div>
-        <div class="stars-chart" data-color="accent">
-          <div class="row-c"><span class="lab">3<i class="fa lab-star">&#xf005;</i></span><span class="bar-bg"><span class="bar-fill" style="width:0%"></span></span><span class="cnt">0</span></div>
-          <div class="row-c"><span class="lab">2<i class="fa lab-star">&#xf005;</i></span><span class="bar-bg"><span class="bar-fill" style="width:0%"></span></span><span class="cnt">0</span></div>
-          <div class="row-c"><span class="lab">1<i class="fa lab-star">&#xf005;</i></span><span class="bar-bg"><span class="bar-fill" style="width:0%"></span></span><span class="cnt">0</span></div>
-          <div class="row-c"><span class="lab">0<i class="fa lab-star">&#xf005;</i></span><span class="bar-bg"><span class="bar-fill" style="width:0%"></span></span><span class="cnt">0</span></div>
-        </div>
-        <div class="divider"></div>
-        <div class="solved-block">
-          <span class="pct">0%</span>
-          <span class="meta">1/290 puzzles<br>Avg time 60:38</span>
+        <div class="stat-section">
+          <div class="st-title">Star distribution</div>
+          <div class="stars-chart" data-color="accent">
+            <div class="row-c"><span class="lab"><span class="d">3</span><i class="fa lab-star">&#xf005;</i></span><span class="bar-bg"><span class="bar-fill" style="width:0%"></span></span><span class="cnt">0</span></div>
+            <div class="row-c"><span class="lab"><span class="d">2</span><i class="fa lab-star">&#xf005;</i></span><span class="bar-bg"><span class="bar-fill" style="width:0%"></span></span><span class="cnt">0</span></div>
+            <div class="row-c"><span class="lab"><span class="d">1</span><i class="fa lab-star">&#xf005;</i></span><span class="bar-bg"><span class="bar-fill" style="width:0%"></span></span><span class="cnt">0</span></div>
+            <div class="row-c"><span class="lab"><span class="d">0</span><i class="fa lab-star">&#xf005;</i></span><span class="bar-bg"><span class="bar-fill" style="width:0%"></span></span><span class="cnt">0</span></div>
+          </div>
         </div>
       </div>
 
       <div class="card gold">
-        <div class="card-tag">Quick Puzzle</div>
-        <div class="divider"></div>
-        <div class="streak-block">
-          <div class="sb"><span class="n">0</span><span class="l">Current streak</span></div>
-          <div class="sb"><span class="n">0</span><span class="l">Longest streak</span></div>
+        <div class="stat-card-head"><span class="stat-dot"></span><h3>Quick Puzzle</h3></div>
+        <div class="stat-grid">
+          <div class="stat-tile"><span class="st-l">Current streak</span><span class="st-v"><i class="fa flame">&#xf06d;</i>3</span></div>
+          <div class="stat-tile"><span class="st-l">Longest streak</span><span class="st-v">7</span></div>
+          <div class="stat-tile"><span class="st-l">Solved</span><span class="st-v">12%</span><span class="st-sub">22/180 puzzles</span></div>
+          <div class="stat-tile"><span class="st-l">Avg time</span><span class="st-v">2:11</span></div>
         </div>
-        <div class="hint-line">Solve today's quick puzzle to start!</div>
-        <div class="divider"></div>
-        <div class="stars-chart" data-color="gold">
-          <div class="row-c"><span class="lab">3<i class="fa lab-star">&#xf005;</i></span><span class="bar-bg"><span class="bar-fill" style="width:0%"></span></span><span class="cnt">0</span></div>
-          <div class="row-c"><span class="lab">2<i class="fa lab-star">&#xf005;</i></span><span class="bar-bg"><span class="bar-fill" style="width:0%"></span></span><span class="cnt">0</span></div>
-          <div class="row-c"><span class="lab">1<i class="fa lab-star">&#xf005;</i></span><span class="bar-bg"><span class="bar-fill" style="width:0%"></span></span><span class="cnt">0</span></div>
-          <div class="row-c"><span class="lab">0<i class="fa lab-star">&#xf005;</i></span><span class="bar-bg"><span class="bar-fill" style="width:0%"></span></span><span class="cnt">0</span></div>
-        </div>
-        <div class="divider"></div>
-        <div class="solved-block">
-          <span class="pct">0%</span>
-          <span class="meta">0/180 puzzles<br>Avg time 24:11</span>
+        <div class="stat-section">
+          <div class="st-title">Star distribution</div>
+          <div class="stars-chart" data-color="gold">
+            <div class="row-c"><span class="lab"><span class="d">3</span><i class="fa lab-star">&#xf005;</i></span><span class="bar-bg"><span class="bar-fill" style="width:0%"></span></span><span class="cnt">0</span></div>
+            <div class="row-c"><span class="lab"><span class="d">2</span><i class="fa lab-star">&#xf005;</i></span><span class="bar-bg"><span class="bar-fill" style="width:0%"></span></span><span class="cnt">0</span></div>
+            <div class="row-c"><span class="lab"><span class="d">1</span><i class="fa lab-star">&#xf005;</i></span><span class="bar-bg"><span class="bar-fill" style="width:0%"></span></span><span class="cnt">0</span></div>
+            <div class="row-c"><span class="lab"><span class="d">0</span><i class="fa lab-star">&#xf005;</i></span><span class="bar-bg"><span class="bar-fill" style="width:0%"></span></span><span class="cnt">0</span></div>
+          </div>
         </div>
       </div>
 
@@ -1213,7 +1240,7 @@
           inner += '<span class="glyph">' + starsHTML(st.stars) + "</span>";
         } else if (st.state === "failed") {
           cell.classList.add("failed");
-          inner += '<span class="glyph"><i class="fa" style="color:#c2402f">&#xf057;</i></span>';
+          inner += '<span class="glyph"><i class="fa" style="color:#d8453a">&#xf057;</i></span>';
         } else if (st.state === "progress") {
           cell.classList.add("progress");
           inner += '<span class="glyph"><i class="fa" style="color:var(--accent)">&#xf70c;</i></span>';
@@ -1287,8 +1314,8 @@
   function renderStatsCharts() {
     var charts = document.querySelectorAll(".stars-chart");
     var data = {
-      accent: [0, 0, 1, 0],   // 3★,2★,1★,0★  (one solve so far)
-      gold:   [0, 0, 0, 0]
+      accent: [14, 9, 3, 1],   // 3★,2★,1★,0★  (sample distribution, sums to 27 solves)
+      gold:   [10, 6, 4, 2]    // sums to 22 solves
     };
     charts.forEach(function (chart) {
       var key = chart.dataset.color;
@@ -1299,7 +1326,7 @@
         var fill = rows[idx].querySelector(".bar-fill");
         var cnt = rows[idx].querySelector(".cnt");
         fill.style.width = (c / max * 100) + "%";
-        fill.style.background = key === "gold" ? "var(--gold)" : "var(--accent)";
+        fill.style.background = "var(--gold)";   // star-distribution bars are gold, matching the star icons
         cnt.textContent = c;
       });
     });
